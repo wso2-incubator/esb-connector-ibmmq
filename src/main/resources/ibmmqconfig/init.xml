@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+
+   WSO2 Inc. licenses this file to you under the Apache License,
+   Version 2.0 (the "License"); you may not use this file except
+   in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied. See the License for the
+   specific language governing permissions and limitations
+   under the License.-->
+
+<template name="init" onError="fault" xmlns="http://ws.apache.org/ns/synapse">
+	<parameter name="username" description="user of the IBM-MQ installation"/>
+	<parameter name="password" description="password of the user IBM-MQ installation"/>
+	<parameter name="port" description="port for the TCP connection"/>
+	<parameter name="host" description="host need to connect"/>
+	<parameter name="qmanager" description="name of the queue manager"/>
+	<parameter name="queue" description="name of the queue"/>
+	<parameter name="channel" description="name of the channel"/>
+	<parameter name="transportType" description="transport type"/>
+	<parameter name="timeOut" description="timeout of the queue"/>
+	<parameter name="ciphersuit" description="ciphersuit for the ssl connection"/>
+	<parameter name="flipsRequired" description="flips no/yes"/>
+	<parameter name="sslEnable" description="ssl enable yes/no"/>
+	<parameter name="trustStore" description="path of the trustStore"/>
+	<parameter name="trustPassword" description="password of the truststore"/>
+	<parameter name="keyStore" description="password of the keyStore"/>
+	<parameter name="keyPassword" description="password of the keyStore"/>
+	<sequence>
+		<property expression="$func:username" name="uri.var.username" scope="default" type="STRING"/>
+		<property expression="$func:password" name="uri.var.password" scope="default" type="STRING"/>
+		<property expression="$func:port" name="uri.var.port" scope="default" type="STRING"/>
+		<property expression="$func:host" name="uri.var.host" scope="default" type="STRING"/>
+		<property expression="$func:qmanager" name="uri.var.qmanager" scope="default" type="STRING"/>
+		<property expression="$func:queue" name="uri.var.queue" scope="default" type="STRING"/>
+		<property expression="$func:channel" name="uri.var.channel" scope="default" type="STRING"/>
+		<property expression="$func:transportType" name="uri.var.transportType" scope="default" type="STRING"/>
+		<property expression="$func:timeOut" name="uri.var.timeOut" scope="default" type="STRING"/>
+		<property expression="$func:ciphersuit" name="uri.var.ciphersuit" scope="default" type="STRING"/>
+		<property expression="$func:flipsRequired" name="uri.var.flipsRequired" scope="default" type="STRING"/>
+		<property expression="$func:sslEnable" name="uri.var.sslEnable" scope="default" type="STRING"/>
+		<property expression="$func:trustStore" name="uri.var.trustStore" scope="default" type="STRING"/>
+		<property expression="$func:trustPassword" name="uri.var.trustPassword" scope="default" type="STRING"/>
+		<property expression="$func:keyStore" name="uri.var.keyStore" scope="default" type="STRING"/>
+		<property expression="$func:keyPassword" name="uri.var.keyPassword" scope="default" type="STRING"/>
+	</sequence>
+</template>
