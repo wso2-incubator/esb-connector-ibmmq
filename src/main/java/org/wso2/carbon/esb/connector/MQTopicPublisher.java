@@ -11,7 +11,7 @@ import org.wso2.carbon.connector.core.ConnectException;
 /**
  * Created by hasitha on 6/30/17.
  */
-public class MQTopicpublisher extends AbstractConnector {
+public class MQTopicPublisher extends AbstractConnector {
 
     public void connect(MessageContext messageContext) throws ConnectException {
         try {
