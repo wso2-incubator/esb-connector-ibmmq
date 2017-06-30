@@ -1,20 +1,3 @@
-/*
-*  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
 package org.wso2.carbon.esb.connector;
 
 import com.ibm.mq.*;
@@ -26,14 +9,12 @@ import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
 
 /**
- * Sample method implementation.
+ * Created by hasitha on 6/30/17.
  */
-public class MQPublisher extends AbstractConnector {
+public class MQTopicpublisher extends AbstractConnector {
 
-    @Override
     public void connect(MessageContext messageContext) throws ConnectException {
         try {
-
             log.info("Message received at ibm-mq connector");
 
             SOAPEnvelope soapEnvelope = messageContext.getEnvelope();
@@ -47,10 +28,10 @@ public class MQPublisher extends AbstractConnector {
             MQConnectionBuilder connectionBuilder = new MQConnectionBuilder(messageContext);
             MQConfiguration config = connectionBuilder.getConfig();
 
-            MQQueue queue = null;
+            MQTopic topic = null;
 
-            if (config.getQueue() != null) {
-                queue = setQueue(connectionBuilder, config);
+            if (config.getTopicName() != null) {
+                topic = setTopic(connectionBuilder, config);
             }
 
             //create message to write
@@ -58,33 +39,33 @@ public class MQPublisher extends AbstractConnector {
             mqMessage.writeString(queueMessage);
             MQPutMessageOptions pmo = new MQPutMessageOptions();
 
-            //execute queue and topic commands
-            if (queue == null) {
-                log.error("Cannot write to queue.Error in queue.");
+            if (topic == null) {
+                log.info("Cannot write to topic.Error in topic.");
             } else {
-                log.info("queue created");
-                queue.put(mqMessage, pmo);
-                queue.close();
+                log.info("topic created");
+                topic.put(mqMessage, pmo);
+                topic.close();
             }
+
             connectionBuilder.closeConnection();
 
         } catch (Exception e) {
-            log.error("Problem in publishing to queue" + e);
+            log.error("Problem in publishing to topic" + e);
             throw new ConnectException(e);
         }
     }
 
-    MQQueue setQueue(MQConnectionBuilder connectionBuilder, MQConfiguration config) {
+    MQTopic setTopic(MQConnectionBuilder connectionBuilder, MQConfiguration config) {
         MQQueueManager manager = connectionBuilder.getQueueManager();
-        MQQueue queue;
+        MQTopic publisher;
         try {
-            queue = manager.accessQueue(config.getQueue(), CMQC.MQOO_OUTPUT);
+            publisher = manager.accessTopic(config.getTopicString(), config.getTopicName(),
+                    CMQC.MQTOPIC_OPEN_AS_PUBLICATION, CMQC.MQOO_OUTPUT);
         } catch (MQException e) {
-            log.error("Error creating queue " + e);
+            log.info("No topic exist with the given name.Creating a new topic.." + e);
             return null;
 
         }
-        return queue;
+        return publisher;
     }
-
 }
