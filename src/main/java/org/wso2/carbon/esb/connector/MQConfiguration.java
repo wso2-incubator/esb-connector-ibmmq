@@ -14,7 +14,9 @@ public class MQConfiguration {
     private String userName;
     private String password;
     private int transportType;
-    private int receiveTimeout;
+    private long timeout;
+    private int maxconnections;
+    private int maxunusedconnections;
     private String ciphersuit;
     private Boolean flipRequired;
     private boolean sslEnable;
@@ -52,6 +54,24 @@ public class MQConfiguration {
             }
         } else {
             this.sslEnable = false;
+        }
+
+        if (msg.getProperty(MQConstants.TIMEOUT) != null) {
+            this.timeout = Long.valueOf((String) msg.getProperty(MQConstants.CIPHERSUIT));
+        } else {
+            this.timeout = 3600000;
+        }
+
+        if (msg.getProperty(MQConstants.MAXCONNECTIONS) != null) {
+            this.maxconnections = Integer.valueOf((String) msg.getProperty(MQConstants.CIPHERSUIT));
+        } else {
+            this.maxconnections = 75;
+        }
+
+        if (msg.getProperty(MQConstants.MAXUNUSEDCONNECTIONS) != null) {
+            this.maxunusedconnections = Integer.valueOf((String) msg.getProperty(MQConstants.CIPHERSUIT));
+        } else {
+            this.maxunusedconnections = 50;
         }
 
         if (msg.getProperty(MQConstants.CIPHERSUIT) != null) {
@@ -114,12 +134,6 @@ public class MQConfiguration {
             this.queue = null;
         }
 
-        if (msg.getProperty(MQConstants.RECEIVE_TIMEOUT) != null) {
-            this.receiveTimeout = Integer.valueOf((String) msg.getProperty(MQConstants.RECEIVE_TIMEOUT));
-        } else {
-            this.receiveTimeout = 1000;
-        }
-
         if (msg.getProperty(MQConstants.CHANNEL) != null) {
             this.channel = (String) msg.getProperty(MQConstants.CHANNEL);
         } else {
@@ -139,8 +153,16 @@ public class MQConfiguration {
         }
     }
 
-    public int getReceiveTimeout() {
-        return receiveTimeout;
+    public int getmaxConnections() {
+        return maxconnections;
+    }
+
+    public int getmaxnusedConnections() {
+        return maxunusedconnections;
+    }
+
+    public long getTimeout() {
+        return timeout;
     }
 
     public String getCiphersuit() {

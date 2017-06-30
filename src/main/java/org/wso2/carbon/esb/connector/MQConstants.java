@@ -12,11 +12,13 @@ public class MQConstants {
     public static final String TOPICNAME = "uri.var.topicname";
     public static final String PORT = "uri.var.port";
     public static final String HOST = "uri.var.host";
+    public static final String TIMEOUT = "uri.var.timeout";
+    public static final String MAXCONNECTIONS = "uri.var.maxconnections";
+    public static final String MAXUNUSEDCONNECTIONS = "uri.var.maxunusedconnections";
     public static final String QMANAGER = "uri.var.qmanager";
     public static final String QUEUE = "uri.var.queue";
     public static final String CHANNEL = "uri.var.channel";
     public static final String TRANSPORT_TYPE = "uri.var.transportType";
-    public static final String RECEIVE_TIMEOUT = "uri.var.timeOut";
 
     //ssl constants
     public static final String CIPHERSUIT = "uri.var.ciphersuit";

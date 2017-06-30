@@ -27,7 +27,9 @@
     <parameter name="queue" description="name of the queue"/>
     <parameter name="channel" description="name of the channel"/>
     <parameter name="transportType" description="transport type"/>
-    <parameter name="timeOut" description="timeout of the queue"/>
+    <parameter name="timeout" description="timeout of the pool"/>
+    <parameter name="maxconnections" description="maxconnection of the pool"/>
+    <parameter name="maxunusedconnections" description="max unused connections of the pool"/>
     <parameter name="ciphersuit" description="ciphersuit for the ssl connection"/>
     <parameter name="flipsRequired" description="flips no/yes"/>
     <parameter name="sslEnable" description="ssl enable yes/no"/>
@@ -46,7 +48,9 @@
         <property expression="$func:queue" name="uri.var.queue" scope="default" type="STRING"/>
         <property expression="$func:channel" name="uri.var.channel" scope="default" type="STRING"/>
         <property expression="$func:transportType" name="uri.var.transportType" scope="default" type="STRING"/>
-        <property expression="$func:timeOut" name="uri.var.timeOut" scope="default" type="STRING"/>
+        <property expression="$func:timeout" name="uri.var.timeout" scope="default" type="STRING"/>
+        <property expression="$func:maxconnections" name="uri.var.maxconnections" scope="default" type="STRING"/>
+        <property expression="$func:maxunusedconnections" name="uri.var.maxunusedconnections" scope="default" type="STRING"/>
         <property expression="$func:ciphersuit" name="uri.var.ciphersuit" scope="default" type="STRING"/>
         <property expression="$func:flipsRequired" name="uri.var.flipsRequired" scope="default" type="STRING"/>
         <property expression="$func:sslEnable" name="uri.var.sslEnable" scope="default" type="STRING"/>

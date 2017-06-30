@@ -1,9 +1,6 @@
 package org.wso2.carbon.esb.connector;
 
-import com.ibm.mq.MQEnvironment;
-import com.ibm.mq.MQException;
-import com.ibm.mq.MQPoolToken;
-import com.ibm.mq.MQQueueManager;
+import com.ibm.mq.*;
 import com.ibm.mq.constants.CMQC;
 import com.ibm.mq.constants.CMQXC;
 import org.apache.synapse.MessageContext;
@@ -22,13 +19,12 @@ import java.util.Vector;
 public class MQConnectionBuilder {
 
     private static MQQueueManager queueManager;
-    MQPoolToken token;
+
     private MQConfiguration config;
 
     MQConnectionBuilder(MessageContext msg) {
 
         this.config = new MQConfiguration(msg);
-        this.token = MQEnvironment.addConnectionPoolToken();
 
         //general properties
         MQEnvironment.hostname = config.getHost();
@@ -50,6 +46,8 @@ public class MQConnectionBuilder {
         Collection headerComp = new Vector();
         headerComp.add(new Integer(CMQXC.MQCOMPRESS_SYSTEM));
         MQEnvironment.hdrCompList = headerComp;
+
+        MQEnvironment.setDefaultConnectionManager(customizedPool(config.getTimeout(),config.getmaxConnections(),config.getmaxnusedConnections()));
 
         try {
             queueManager = new MQQueueManager(config.getqManger());
@@ -74,13 +72,20 @@ public class MQConnectionBuilder {
             if (queueManager.isConnected()) {
                 queueManager.close();
                 queueManager = null;
-                MQEnvironment.removeConnectionPoolToken(token);
             }
         } catch (MQException e) {
 
         }
     }
 
+    MQSimpleConnectionManager customizedPool(long timeout,int maxConnections,int maxunusedConnections) {
+        MQSimpleConnectionManager customizedPool=new MQSimpleConnectionManager();
+        customizedPool.setActive(MQSimpleConnectionManager.MODE_AUTO);
+        customizedPool.setTimeout(timeout);
+        customizedPool.setMaxConnections(maxConnections);
+        customizedPool.setMaxUnusedConnections(maxunusedConnections);
+        return  customizedPool;
+    }
     public MQConfiguration getConfig() {
         return config;
     }
