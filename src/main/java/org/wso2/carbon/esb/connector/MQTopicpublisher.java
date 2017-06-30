@@ -62,7 +62,7 @@ public class MQTopicpublisher extends AbstractConnector {
             publisher = manager.accessTopic(config.getTopicString(), config.getTopicName(),
                     CMQC.MQTOPIC_OPEN_AS_PUBLICATION, CMQC.MQOO_OUTPUT);
         } catch (MQException e) {
-            log.info("No topic exist with the given name.Creating a new topic.." + e);
+            log.error("Error crreating topic" + e);
             return null;
 
         }
