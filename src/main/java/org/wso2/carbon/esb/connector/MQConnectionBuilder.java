@@ -1,6 +1,9 @@
 package org.wso2.carbon.esb.connector;
 
-import com.ibm.mq.*;
+import com.ibm.mq.MQEnvironment;
+import com.ibm.mq.MQException;
+import com.ibm.mq.MQPoolToken;
+import com.ibm.mq.MQQueueManager;
 import com.ibm.mq.constants.CMQC;
 import com.ibm.mq.constants.CMQXC;
 import org.apache.synapse.MessageContext;

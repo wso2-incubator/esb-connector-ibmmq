@@ -23,6 +23,8 @@
             <ibmmq.init>
                 <username>{websphere mq user}</username>
                 <password>{websphere mq user password}</password>
+                <topicname>{websphere mq user topicname}</topicname>
+                <topicstring>{websphere mq user topicpassword}</topicstring>
                 <port>1414</port>
                 <host>127.0.0.1</host>
                 <qmanager>{websphere mq queue manager name}</qmanager>
@@ -57,6 +59,8 @@
             <ibmmq.init>
                 <username>{websphere mq user}</username>
                 <password>{websphere mq user password}</password>
+                <topicname>{websphere mq user topicname}</topicname>
+                <topicstring>{websphere mq user topicpassword}</topicstring>
                 <port>1414</port>
                 <host>127.0.0.1</host>
                 <qmanager>{websphere mq queue manager name}</qmanager>

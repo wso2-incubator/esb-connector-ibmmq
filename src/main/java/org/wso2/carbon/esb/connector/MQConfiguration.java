@@ -7,6 +7,8 @@ public class MQConfiguration {
     private final int port;
     private final String host;
     private String qManger;
+    private String topicName;
+    private String topicString;
     private String queue;
     private String channel;
     private String userName;
@@ -24,13 +26,25 @@ public class MQConfiguration {
     MQConfiguration(MessageContext msg) {
 
         if (msg.getProperty(MQConstants.PORT) != null) {
-            this.port = Integer.valueOf((String)msg.getProperty(MQConstants.PORT));
+            this.port = Integer.valueOf((String) msg.getProperty(MQConstants.PORT));
         } else {
             this.port = 1414;
         }
 
+        if (msg.getProperty(MQConstants.TOPICNAME) != null) {
+            this.topicName = (String) msg.getProperty(MQConstants.TOPICNAME);
+        } else {
+            this.topicName = null;
+        }
+
+        if (msg.getProperty(MQConstants.TOPICSTRING) != null) {
+            this.topicString = (String) msg.getProperty(MQConstants.TOPICSTRING);
+        } else {
+            this.topicString = null;
+        }
+
         if (msg.getProperty(MQConstants.SSL_ENABLE) != null) {
-            boolean sslProps = Boolean.valueOf((String)msg.getProperty(MQConstants.SSL_ENABLE));
+            boolean sslProps = Boolean.valueOf((String) msg.getProperty(MQConstants.SSL_ENABLE));
             if (sslProps) {
                 this.sslEnable = true;
             } else {
@@ -47,13 +61,13 @@ public class MQConfiguration {
         }
 
         if (msg.getProperty(MQConstants.FLIP_REQUIRED) != null) {
-            this.flipRequired = Boolean.valueOf((String)msg.getProperty(MQConstants.FLIP_REQUIRED));
+            this.flipRequired = Boolean.valueOf((String) msg.getProperty(MQConstants.FLIP_REQUIRED));
         } else {
             this.flipRequired = false;
         }
 
         if (msg.getProperty(MQConstants.TRUST_STORE) != null) {
-            this.trustStore = System.getProperty("user.dir")+"/"+(String) msg.getProperty(MQConstants.TRUST_STORE);
+            this.trustStore = System.getProperty("user.dir") + "/" + (String) msg.getProperty(MQConstants.TRUST_STORE);
         } else {
             this.trustStore = null;
         }
@@ -65,7 +79,7 @@ public class MQConfiguration {
         }
 
         if (msg.getProperty(MQConstants.KEY_STORE) != null) {
-            this.keyStore = System.getProperty("user.dir")+"/"+(String) msg.getProperty(MQConstants.KEY_STORE);
+            this.keyStore = System.getProperty("user.dir") + "/" + (String) msg.getProperty(MQConstants.KEY_STORE);
         } else {
             this.keyStore = null;
         }
@@ -83,7 +97,7 @@ public class MQConfiguration {
         }
 
         if (msg.getProperty(MQConstants.TRANSPORT_TYPE) != null) {
-            this.transportType = Integer.valueOf((String)msg.getProperty(MQConstants.TRANSPORT_TYPE));
+            this.transportType = Integer.valueOf((String) msg.getProperty(MQConstants.TRANSPORT_TYPE));
         } else {
             this.transportType = 1; //Default client type
         }
@@ -101,7 +115,7 @@ public class MQConfiguration {
         }
 
         if (msg.getProperty(MQConstants.RECEIVE_TIMEOUT) != null) {
-            this.receiveTimeout = Integer.valueOf((String)msg.getProperty(MQConstants.RECEIVE_TIMEOUT));
+            this.receiveTimeout = Integer.valueOf((String) msg.getProperty(MQConstants.RECEIVE_TIMEOUT));
         } else {
             this.receiveTimeout = 1000;
         }
@@ -159,6 +173,14 @@ public class MQConfiguration {
 
     public int getTransportType() {
         return transportType;
+    }
+
+    public String getTopicName() {
+        return topicName;
+    }
+
+    public String getTopicString() {
+        return topicString;
     }
 
     public int getPort() {

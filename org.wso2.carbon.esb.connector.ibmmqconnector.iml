@@ -12,9 +12,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="com.ibm.mq.allclient" level="project" />
-    <orderEntry type="library" name="fscontext" level="project" />
-    <orderEntry type="library" name="providerutil" level="project" />
     <orderEntry type="library" name="Maven: org.wso2.carbon.mediation:org.wso2.carbon.mediation.initializer:4.4.10" level="project" />
     <orderEntry type="library" name="Maven: org.wso2.carbon:org.wso2.carbon.core:4.4.1" level="project" />
     <orderEntry type="library" name="Maven: org.wso2.orbit.com.hazelcast:hazelcast:3.5.0.wso2v1" level="project" />

@@ -8,6 +8,8 @@ public class MQConstants {
     //general constants
     public static final String USERNAME = "uri.var.username";
     public static final String PASSWORD = "uri.var.password";
+    public static final String TOPICSTRING = "uri.var.topicstring";
+    public static final String TOPICNAME = "uri.var.topicname";
     public static final String PORT = "uri.var.port";
     public static final String HOST = "uri.var.host";
     public static final String QMANAGER = "uri.var.qmanager";

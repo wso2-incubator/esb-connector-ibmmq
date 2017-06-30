@@ -16,11 +16,11 @@
    specific language governing permissions and limitations
    under the License.
 -->
-<component name="ibmmqconfig" type="synapse/template" >
-    <subComponents> 
-		<component name="init" >
-	    		<file>init.xml</file>
-	    		<description>Configure IBM MQ connector</description>
-		</component>
-    </subComponents>    
+<component name="ibmmqconfig" type="synapse/template">
+    <subComponents>
+        <component name="init">
+            <file>init.xml</file>
+            <description>Configure IBM MQ connector</description>
+        </component>
+    </subComponents>
 </component>
