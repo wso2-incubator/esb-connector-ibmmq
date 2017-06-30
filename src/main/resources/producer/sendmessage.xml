@@ -18,6 +18,6 @@
 
 <template name="sendmessage" onError="fault" xmlns="http://ws.apache.org/ns/synapse">
     <sequence>
-        <class name="org.wso2.carbon.esb.connector.MQPublisher"/>
+        <class name="org.wso2.carbon.esb.connector.MQPutQueue"/>
     </sequence>
 </template>

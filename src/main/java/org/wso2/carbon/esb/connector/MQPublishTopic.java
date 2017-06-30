@@ -11,8 +11,9 @@ import org.wso2.carbon.connector.core.ConnectException;
 /**
  * Created by hasitha on 6/30/17.
  */
-public class MQTopicPublisher extends AbstractConnector {
+public class MQPublishTopic extends AbstractConnector {
 
+    @Override
     public void connect(MessageContext messageContext) throws ConnectException {
         try {
             log.info("Message received at ibm-mq connector");

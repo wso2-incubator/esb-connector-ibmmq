@@ -28,7 +28,7 @@ import org.wso2.carbon.connector.core.ConnectException;
 /**
  * Sample method implementation.
  */
-public class MQPublisher extends AbstractConnector {
+public class MQPutQueue extends AbstractConnector {
 
     @Override
     public void connect(MessageContext messageContext) throws ConnectException {
