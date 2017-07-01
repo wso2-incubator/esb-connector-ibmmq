@@ -31,7 +31,9 @@
                 <queue>{websphere mq queue name}</queue>
                 <channel>{websphere mq channel name}</channel>
                 <transportType>1</transportType>
-                <timeOut>1000</timeOut>
+                <timeout>360000</timeOut>
+                <maxconnections>75</maxconnections>
+                <maxunusedconnections>50</maxunusedconnections>
                 <sslEnable>false</sslEnable>
                 <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
                 <flipsRequired>false</flipsRequired>
@@ -67,7 +69,9 @@
                 <queue>{websphere mq queue name}</queue>
                 <channel>{websphere mq channel name}</channel>
                 <transportType>1</transportType>
-                <timeOut>1000</timeOut>
+                <timeout>360000</timeOut>
+                <maxconnections>75</maxconnections>
+                <maxunusedconnections>50</maxunusedconnections>
                 <sslEnable>true</sslEnable>
                 <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
                 <flipsRequired>false</flipsRequired>
