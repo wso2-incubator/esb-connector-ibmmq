@@ -9,7 +9,7 @@ import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
 
 /**
- * Created by hasitha on 6/30/17.
+ * Publish to topic
  */
 public class MQPublishTopic extends AbstractConnector {
 

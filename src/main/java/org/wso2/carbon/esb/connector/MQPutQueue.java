@@ -26,7 +26,7 @@ import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
 
 /**
- * Sample method implementation.
+ * Add messages to queue
  */
 public class MQPutQueue extends AbstractConnector {
 

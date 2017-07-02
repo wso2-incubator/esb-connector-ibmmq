@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.Vector;
 
 /**
- * Created by hasitha on 6/27/17.
+ * Start connection with IBM MQ queue manager
  */
 public class MQConnectionBuilder {
 

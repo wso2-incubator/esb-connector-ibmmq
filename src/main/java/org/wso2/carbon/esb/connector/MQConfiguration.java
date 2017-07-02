@@ -2,6 +2,10 @@ package org.wso2.carbon.esb.connector;
 
 import org.apache.synapse.MessageContext;
 
+/**
+ * IBM MQ configuration parameters
+ */
+
 public class MQConfiguration {
 
     private final int port;

@@ -1,7 +1,7 @@
 package org.wso2.carbon.esb.connector;
 
 /**
- * Created by hasitha on 6/26/17.
+ * IBM MQ constants
  */
 public class MQConstants {
 
