@@ -11,6 +11,8 @@
 3. Upload the connector to wso2 esb through management console<br>
 4. Enable the connector
 5. Write a proxy service for testing the connector
+6. For ssl import the certificate to the client-trustore.jks using following command.
+* keytool -importcert -file <certificate file> -keystore <ESB>/repository/resources/security/client-truststore.jks -alias "ibmwebspheremqqmanager"
 
 #### Sample proxy service
 ```
