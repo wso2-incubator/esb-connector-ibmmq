@@ -71,10 +71,10 @@
                 <sslEnable>true</sslEnable>
                 <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
                 <flipsRequired>false</flipsRequired>
-                <trustStore>{keystorename.jks}</trustStore>
-                <trustPassword>{keystore password}</trustPassword>
-                <keyStore>{keystorename.jks}</keyStore>
-                <keyPassword>{keystore password}</keyPassword>
+                <trustStore>client-truststore.jks</trustStore>
+                <trustPassword>wso2carbon</trustPassword>
+                <keyStore>client-truststore.jks</keyStore>
+                <keyPassword>wso2carbon</keyPassword>
             </ibmmq.init>
             <ibmmq.sendmessage/>
             <log level="full"/>
@@ -108,10 +108,10 @@
                 <sslEnable>true</sslEnable>
                 <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
                 <flipsRequired>false</flipsRequired>
-                <trustStore>{keystorename.jks}</trustStore>
-                <trustPassword>{keystore password}</trustPassword>
-                <keyStore>{keystorename.jks}</keyStore>
-                <keyPassword>{keystore password}</keyPassword>
+                <trustStore>client-truststore.jks</trustStore>
+                <trustPassword>wso2carbon</trustPassword>
+                <keyStore>client-truststore.jks</keyStore>
+                <keyPassword>wso2carbon</keyPassword>
             </ibmmq.init>
             <ibmmq.publishtopic/>
             <log level="full"/>

@@ -16,33 +16,35 @@
  ~  specific language governing permissions and limitations
  ~  under the License.
 -->
-
-<proxy xmlns="http://ws.apache.org/ns/synapse" name="Sample"
-       transports="https,http" statistics="disable" trace="disable"
-       startOnLoad="true">
+<proxy xmlns="http://ws.apache.org/ns/synapse"
+       name="ibmmqtest"
+       startOnLoad="true"
+       statistics="disable"
+       trace="disable"
+       transports="http,https">
     <target>
         <inSequence>
             <ibmmq.init>
-                <username>mqm</username>>
+                <username>mqm</username>
                 <password>upgs5423</password>
                 <port>1414</port>
                 <host>127.0.0.1</host>
                 <qmanager>qmanager</qmanager>
                 <queue>myqueue</queue>
+                <topicname>mytopic</topicname>
+                <topicstring>topic</topicstring>
                 <channel>PASSWORD.SVRCONN</channel>
                 <transportType>1</transportType>
                 <timeOut>1000</timeOut>
-                <sslEnable>false</sslEnable>
+                <sslEnable>true</sslEnable>
                 <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
                 <flipsRequired>false</flipsRequired>
-                <trustStore>/home/hasitha/wso2carbon.jks</trustStore>
+                <trustStore>client-truststore.jks</trustStore>
                 <trustPassword>wso2carbon</trustPassword>
-                <keyStore>/home/hasitha/wso2carbon.jks</keyStore>
+                <keyStore>client-truststore.jks</keyStore>
                 <keyPassword>wso2carbon</keyPassword>
             </ibmmq.init>
             <ibmmq.sendmessage/>
-            <log level="full"/>
-            <respond/>
         </inSequence>
     </target>
     <description/>
