@@ -78,7 +78,7 @@
                 <messageID>{preffered message ID}</messageID>
                 <correlationID>{preffered correlation ID}</correlationID>
             </ibmmq.init>
-            <ibmmq.publishtopic/>
+            <ibmmq.sendmessage/>
             <log level="full"/>
         </inSequence>
     </target>
