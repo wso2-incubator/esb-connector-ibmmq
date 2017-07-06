@@ -25,22 +25,19 @@
             <ibmmq.init>
                 <username>{websphere mq user}</username>
                 <password>{websphere mq user password}</password>
+                <topicname>{websphere mq user topicname}</topicname>
+                <topicstring>{websphere mq user topicpassword}</topicstring>
                 <port>1414</port>
                 <host>127.0.0.1</host>
                 <qmanager>{websphere mq queue manager name}</qmanager>
-                <queue>{websphere mq queue name}</queue>
                 <channel>{websphere mq channel name}</channel>
                 <transportType>1</transportType>
                 <timeout>360000</timeOut>
                 <maxconnections>75</maxconnections>
                 <maxunusedconnections>50</maxunusedconnections>
                 <sslEnable>false</sslEnable>
-                <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
-                <flipsRequired>false</flipsRequired>
-                <trustStore>null</trustStore>
-                <trustPassword>null</trustPassword>
-                <keyStore>null</keyStore>
-                <keyPassword>null</keyPassword>
+                <messageID>{preffered message ID}</messageID>
+                <correlationID>{preffered correlation ID}</correlationID>
             </ibmmq.init>
             <ibmmq.sendmessage/>
         </inSequence>
@@ -50,42 +47,6 @@
 
 ```
 #### Sample proxy service with ssl
-
-```
-<?xml version="1.0" encoding="UTF-8"?>
-<proxy xmlns="http://ws.apache.org/ns/synapse" name="ibmmqtest"
-       transports="https,http" statistics="disable" trace="disable"
-       startOnLoad="true">
-    <target>
-        <inSequence>
-            <ibmmq.init>
-                <username>{websphere mq user}</username>
-                <password>{websphere mq user password}</password>
-                <port>1414</port>
-                <host>127.0.0.1</host>
-                <qmanager>{websphere mq queue manager name}</qmanager>
-                <queue>{websphere mq queue name}</queue>
-                <channel>{websphere mq channel name}</channel>
-                <transportType>1</transportType>
-                <timeout>360000</timeOut>
-                <maxconnections>75</maxconnections>
-                <maxunusedconnections>50</maxunusedconnections>
-                <sslEnable>true</sslEnable>
-                <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
-                <flipsRequired>false</flipsRequired>
-                <trustStore>client-truststore.jks</trustStore>
-                <trustPassword>wso2carbon</trustPassword>
-                <keyStore>client-truststore.jks</keyStore>
-                <keyPassword>wso2carbon</keyPassword>
-            </ibmmq.init>
-            <ibmmq.sendmessage/>
-            <log level="full"/>
-        </inSequence>
-    </target>
-    <description/>
-</proxy>
-```
-#### Sample proxy service to publish message to topic
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -110,10 +71,12 @@
                 <sslEnable>true</sslEnable>
                 <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
                 <flipsRequired>false</flipsRequired>
-                <trustStore>client-truststore.jks</trustStore>
+                <trustStore>wso2carbon.jks</trustStore>
                 <trustPassword>wso2carbon</trustPassword>
-                <keyStore>client-truststore.jks</keyStore>
+                <keyStore>wso2carbon.jks</keyStore>
                 <keyPassword>wso2carbon</keyPassword>
+                <messageID>{preffered message ID}</messageID>
+                <correlationID>{preffered correlation ID}</correlationID>
             </ibmmq.init>
             <ibmmq.publishtopic/>
             <log level="full"/>

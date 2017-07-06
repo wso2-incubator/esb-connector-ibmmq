@@ -1,6 +1,26 @@
+/*
+*  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+*  WSO2 Inc. licenses this file to you under the Apache License,
+*  Version 2.0 (the "License"); you may not use this file except
+*  in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
 package org.wso2.carbon.esb.connector;
 
-import com.ibm.mq.*;
+import com.ibm.mq.MQEnvironment;
+import com.ibm.mq.MQException;
+import com.ibm.mq.MQQueueManager;
+import com.ibm.mq.MQSimpleConnectionManager;
 import com.ibm.mq.constants.CMQC;
 import com.ibm.mq.constants.CMQXC;
 import org.apache.synapse.MessageContext;
@@ -26,28 +46,25 @@ public class MQConnectionBuilder {
 
         this.config = new MQConfiguration(msg);
 
-        //general properties
         MQEnvironment.hostname = config.getHost();
         MQEnvironment.channel = config.getChannel();
         MQEnvironment.port = config.getPort();
 
-        //SSL properties
         if (config.isSslEnable()) {
             MQEnvironment.sslCipherSuite = config.getCiphersuit();
             MQEnvironment.sslSocketFactory = createSSLContext().getSocketFactory();
             MQEnvironment.sslCipherSuite = config.getCiphersuit();
+            MQEnvironment.sslFipsRequired = config.getFlipRequired();
         }
 
         MQEnvironment.properties.put(CMQC.TRANSPORT_PROPERTY, CMQC.TRANSPORT_MQSERIES_CLIENT);
         MQEnvironment.properties.put(CMQC.USER_ID_PROPERTY, config.getUserName());
         MQEnvironment.properties.put(CMQC.PASSWORD_PROPERTY, config.getPassword());
-
-        //Compress headers
         Collection headerComp = new Vector();
         headerComp.add(new Integer(CMQXC.MQCOMPRESS_SYSTEM));
         MQEnvironment.hdrCompList = headerComp;
 
-        MQEnvironment.setDefaultConnectionManager(customizedPool(config.getTimeout(),config.getmaxConnections(),config.getmaxnusedConnections()));
+        MQEnvironment.setDefaultConnectionManager(customizedPool(config.getTimeout(), config.getmaxConnections(), config.getmaxnusedConnections()));
 
         try {
             queueManager = new MQQueueManager(config.getqManger());
@@ -56,6 +73,9 @@ public class MQConnectionBuilder {
         }
     }
 
+    /**
+     * Initialize queue manager
+     */
     public MQQueueManager getQueueManager() {
         if (queueManager == null || !queueManager.isConnected()) {
             try {
@@ -67,6 +87,9 @@ public class MQConnectionBuilder {
         return queueManager;
     }
 
+    /**
+     * Terminate connection with queue manager
+     */
     public void closeConnection() {
         try {
             if (queueManager.isConnected()) {
@@ -78,18 +101,25 @@ public class MQConnectionBuilder {
         }
     }
 
-    MQSimpleConnectionManager customizedPool(long timeout,int maxConnections,int maxunusedConnections) {
-        MQSimpleConnectionManager customizedPool=new MQSimpleConnectionManager();
+    /**
+     * Setup customized connection pool for caching
+     */
+    MQSimpleConnectionManager customizedPool(long timeout, int maxConnections, int maxunusedConnections) {
+        MQSimpleConnectionManager customizedPool = new MQSimpleConnectionManager();
         customizedPool.setActive(MQSimpleConnectionManager.MODE_AUTO);
         customizedPool.setTimeout(timeout);
         customizedPool.setMaxConnections(maxConnections);
         customizedPool.setMaxUnusedConnections(maxunusedConnections);
-        return  customizedPool;
+        return customizedPool;
     }
+
     public MQConfiguration getConfig() {
         return config;
     }
 
+    /**
+     * Creating SSLContext for ssl connection
+     */
     public SSLContext createSSLContext() {
         try {
             Class.forName("com.sun.net.ssl.internal.ssl.Provider");

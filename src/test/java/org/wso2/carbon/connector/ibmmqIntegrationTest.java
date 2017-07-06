@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.esb.connector;
+package org.wso2.carbon.connector;
 
 import org.json.JSONObject;
 import org.testng.annotations.BeforeClass;

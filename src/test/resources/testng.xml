@@ -27,7 +27,7 @@
     </listeners>
     <test name="Sample-Connector-Test" preserve-order="true" verbose="2">
         <packages>
-            <package name="org.wso2.carbon.connector"/>
+            <package name="org.wso2.carbon.esb.connector"/>
         </packages>
     </test>
 </suite>

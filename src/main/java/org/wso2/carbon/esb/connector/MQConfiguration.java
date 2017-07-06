@@ -1,11 +1,29 @@
+/*
+*  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+*  WSO2 Inc. licenses this file to you under the Apache License,
+*  Version 2.0 (the "License"); you may not use this file except
+*  in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
 package org.wso2.carbon.esb.connector;
 
 import org.apache.synapse.MessageContext;
 
+import java.util.UUID;
+
 /**
  * IBM MQ configuration parameters
  */
-
 public class MQConfiguration {
 
     private final int port;
@@ -28,6 +46,8 @@ public class MQConfiguration {
     private String trustPassword;
     private String keyStore;
     private String keyPassword;
+    private String messageID;
+    private String correlationID;
 
     MQConfiguration(MessageContext msg) {
 
@@ -66,13 +86,13 @@ public class MQConfiguration {
             this.timeout = 3600000;
         }
 
-        if (msg.getProperty(MQConstants.MAXCONNECTIONS) != null) {
+        if (msg.getProperty(MQConstants.MAX_CONNECTIONS) != null) {
             this.maxconnections = Integer.valueOf((String) msg.getProperty(MQConstants.CIPHERSUIT));
         } else {
             this.maxconnections = 75;
         }
 
-        if (msg.getProperty(MQConstants.MAXUNUSEDCONNECTIONS) != null) {
+        if (msg.getProperty(MQConstants.MAX_UNUSED_CONNECTIONS) != null) {
             this.maxunusedconnections = Integer.valueOf((String) msg.getProperty(MQConstants.CIPHERSUIT));
         } else {
             this.maxunusedconnections = 50;
@@ -102,6 +122,18 @@ public class MQConfiguration {
             this.trustPassword = null;
         }
 
+        if (msg.getProperty(MQConstants.MESSAGE_ID) != null) {
+            this.messageID = (String) msg.getProperty(MQConstants.MESSAGE_ID);
+        } else {
+            this.messageID = UUID.randomUUID().toString();
+        }
+
+        if (msg.getProperty(MQConstants.CORRELATION_ID) != null) {
+            this.correlationID = (String) msg.getProperty(MQConstants.CORRELATION_ID);
+        } else {
+            this.correlationID = UUID.randomUUID().toString();
+        }
+
         if (msg.getProperty(MQConstants.KEY_STORE) != null) {
             this.keyStore = System.getProperty("user.dir") + "/repository/resources/security/" + (String) msg.getProperty(MQConstants.KEY_STORE);
         } else {
@@ -123,7 +155,7 @@ public class MQConfiguration {
         if (msg.getProperty(MQConstants.TRANSPORT_TYPE) != null) {
             this.transportType = Integer.valueOf((String) msg.getProperty(MQConstants.TRANSPORT_TYPE));
         } else {
-            this.transportType = 1; //Default client type
+            this.transportType = 1;
         }
 
         if (msg.getProperty(MQConstants.QMANAGER) != null) {
@@ -197,10 +229,6 @@ public class MQConfiguration {
         return keyPassword;
     }
 
-    public int getTransportType() {
-        return transportType;
-    }
-
     public String getTopicName() {
         return topicName;
     }
@@ -235,5 +263,13 @@ public class MQConfiguration {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getMessageID() {
+        return messageID;
+    }
+
+    public String getCorrelationID() {
+        return correlationID;
     }
 }

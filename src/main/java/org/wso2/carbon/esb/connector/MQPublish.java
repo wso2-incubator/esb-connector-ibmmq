@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -22,13 +22,14 @@ import com.ibm.mq.constants.CMQC;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
 
 /**
  * Add messages to queue
  */
-public class MQPutQueue extends AbstractConnector {
+public class MQPublish extends AbstractConnector {
 
     @Override
     public void connect(MessageContext messageContext) throws ConnectException {
@@ -41,31 +42,52 @@ public class MQPutQueue extends AbstractConnector {
             String queueMessage = "";
 
             if (getElement != null) {
-                queueMessage = getElement.getText();
+                queueMessage = getElement.toString();
             }
 
             MQConnectionBuilder connectionBuilder = new MQConnectionBuilder(messageContext);
             MQConfiguration config = connectionBuilder.getConfig();
 
+            String contentType = (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext().getProperty("ContentType");
+            String charsetEncoding = (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext().getProperty("CHARACTER_SET_ENCODING");
+
             MQQueue queue = null;
+            MQTopic topic = null;
 
             if (config.getQueue() != null) {
                 queue = setQueue(connectionBuilder, config);
             }
 
-            //create message to write
+            if (config.getTopicName() != null) {
+                topic = setTopic(connectionBuilder, config);
+            }
+
             MQMessage mqMessage = new MQMessage();
             mqMessage.writeString(queueMessage);
+            mqMessage.messageId = config.getMessageID().getBytes();
+            mqMessage.correlationId=config.getCorrelationID().getBytes();
+            mqMessage.setStringProperty("ContentType", contentType);
+            mqMessage.setStringProperty("CHARACTER_SET_ENCODING", charsetEncoding);
             MQPutMessageOptions pmo = new MQPutMessageOptions();
 
-            //execute queue and topic commands
             if (queue == null) {
                 log.error("Cannot write to queue.Error in queue.");
             } else {
-                log.info("queue created");
+                log.info("queue initialized");
                 queue.put(mqMessage, pmo);
                 queue.close();
+                log.info("Message sucessfully placed at "+config.getQueue()+"queue");
             }
+
+            if (topic == null) {
+                log.info("Cannot write to topic.Error in topic.");
+            } else {
+                log.info("topic initialized");
+                topic.put(mqMessage, pmo);
+                topic.close();
+                log.info("Message sucessfully placed at "+config.getTopicName()+"topic");
+            }
+
             connectionBuilder.closeConnection();
 
         } catch (Exception e) {
@@ -74,6 +96,9 @@ public class MQPutQueue extends AbstractConnector {
         }
     }
 
+    /**
+     * Iniitialize queue
+     */
     MQQueue setQueue(MQConnectionBuilder connectionBuilder, MQConfiguration config) {
         MQQueueManager manager = connectionBuilder.getQueueManager();
         MQQueue queue;
@@ -85,6 +110,23 @@ public class MQPutQueue extends AbstractConnector {
 
         }
         return queue;
+    }
+
+    /**
+     * Initialize queue
+     */
+    MQTopic setTopic(MQConnectionBuilder connectionBuilder, MQConfiguration config) {
+        MQQueueManager manager = connectionBuilder.getQueueManager();
+        MQTopic publisher;
+        try {
+            publisher = manager.accessTopic(config.getTopicString(), config.getTopicName(),
+                    CMQC.MQTOPIC_OPEN_AS_PUBLICATION, CMQC.MQOO_OUTPUT);
+        } catch (MQException e) {
+            log.error("Error creating topic" + e);
+            return null;
+
+        }
+        return publisher;
     }
 
 }
