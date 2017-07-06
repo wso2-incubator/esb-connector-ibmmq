@@ -24,8 +24,8 @@ public class MQConstants {
 
     public static final String USERNAME = "uri.var.username";
     public static final String PASSWORD = "uri.var.password";
-    public static final String TOPICSTRING = "uri.var.topicstring";
-    public static final String TOPICNAME = "uri.var.topicname";
+    public static final String TOPIC_STRING = "uri.var.topicstring";
+    public static final String TOPIC_NAME = "uri.var.topicname";
     public static final String PORT = "uri.var.port";
     public static final String HOST = "uri.var.host";
     public static final String TIMEOUT = "uri.var.timeout";

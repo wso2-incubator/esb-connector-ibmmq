@@ -57,14 +57,14 @@ public class MQConfiguration {
             this.port = 1414;
         }
 
-        if (msg.getProperty(MQConstants.TOPICNAME) != null) {
-            this.topicName = (String) msg.getProperty(MQConstants.TOPICNAME);
+        if (msg.getProperty(MQConstants.TOPIC_NAME) != null) {
+            this.topicName = (String) msg.getProperty(MQConstants.TOPIC_NAME);
         } else {
             this.topicName = null;
         }
 
-        if (msg.getProperty(MQConstants.TOPICSTRING) != null) {
-            this.topicString = (String) msg.getProperty(MQConstants.TOPICSTRING);
+        if (msg.getProperty(MQConstants.TOPIC_STRING) != null) {
+            this.topicString = (String) msg.getProperty(MQConstants.TOPIC_STRING);
         } else {
             this.topicString = null;
         }
