@@ -18,8 +18,7 @@
 package org.wso2.carbon.esb.connector;
 
 import org.apache.synapse.MessageContext;
-
-import java.util.UUID;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 
 /**
  * IBM MQ configuration parameters
@@ -48,8 +47,23 @@ public class MQConfiguration {
     private String keyPassword;
     private String messageID;
     private String correlationID;
+    private String groupID;
+    private String contentType;
+    private String charsetEncoding;
 
     MQConfiguration(MessageContext msg) {
+
+        if(((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("ContentType")!=null){
+            this.contentType=(String) ((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("ContentType");
+        }else{
+            this.contentType=MQConstants.CONTENT_TYPE;
+        }
+
+        if(((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("CHARACTER_SET_ENCODING")!=null){
+            this.charsetEncoding=(String) ((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("CHARACTER_SET_ENCODING");
+        }else{
+            this.charsetEncoding=MQConstants.CHARSET_ENCODING;
+        }
 
         if (msg.getProperty(MQConstants.PORT) != null) {
             this.port = Integer.valueOf((String) msg.getProperty(MQConstants.PORT));
@@ -125,13 +139,19 @@ public class MQConfiguration {
         if (msg.getProperty(MQConstants.MESSAGE_ID) != null) {
             this.messageID = (String) msg.getProperty(MQConstants.MESSAGE_ID);
         } else {
-            this.messageID = UUID.randomUUID().toString();
+            this.messageID = ((Axis2MessageContext) msg).getAxis2MessageContext().getMessageID();
         }
 
         if (msg.getProperty(MQConstants.CORRELATION_ID) != null) {
             this.correlationID = (String) msg.getProperty(MQConstants.CORRELATION_ID);
         } else {
-            this.correlationID = UUID.randomUUID().toString();
+            this.correlationID = ((Axis2MessageContext) msg).getAxis2MessageContext().getLogCorrelationID();
+        }
+
+        if (msg.getProperty(MQConstants.GROUP_ID) != null) {
+            this.groupID = (String) msg.getProperty(MQConstants.GROUP_ID);
+        } else {
+            this.groupID = null;
         }
 
         if (msg.getProperty(MQConstants.KEY_STORE) != null) {
@@ -271,5 +291,17 @@ public class MQConfiguration {
 
     public String getCorrelationID() {
         return correlationID;
+    }
+
+    public String getgroupID() {
+        return groupID;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public String getCharsetEncoding() {
+        return charsetEncoding;
     }
 }

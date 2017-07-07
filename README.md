@@ -38,6 +38,7 @@
                 <sslEnable>false</sslEnable>
                 <messageID>{preffered message ID}</messageID>
                 <correlationID>{preffered correlation ID}</correlationID>
+                <groupID>{preffered group ID}</groupID>
             </ibmmq.init>
             <ibmmq.sendmessage/>
         </inSequence>
@@ -77,6 +78,7 @@
                 <keyPassword>wso2carbon</keyPassword>
                 <messageID>{preffered message ID}</messageID>
                 <correlationID>{preffered correlation ID}</correlationID>
+                <groupID>{preffered group ID}</groupID>
             </ibmmq.init>
             <ibmmq.sendmessage/>
             <log level="full"/>

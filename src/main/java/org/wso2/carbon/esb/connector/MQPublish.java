@@ -22,9 +22,14 @@ import com.ibm.mq.constants.CMQC;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
+
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import static com.ibm.mq.constants.CMQC.MQENC_NATIVE;
+import static com.ibm.mq.constants.CMQC.MQFMT_STRING;
 
 /**
  * Add messages to queue
@@ -48,9 +53,6 @@ public class MQPublish extends AbstractConnector {
             MQConnectionBuilder connectionBuilder = new MQConnectionBuilder(messageContext);
             MQConfiguration config = connectionBuilder.getConfig();
 
-            String contentType = (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext().getProperty("ContentType");
-            String charsetEncoding = (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext().getProperty("CHARACTER_SET_ENCODING");
-
             MQQueue queue = null;
             MQTopic topic = null;
 
@@ -62,12 +64,7 @@ public class MQPublish extends AbstractConnector {
                 topic = setTopic(connectionBuilder, config);
             }
 
-            MQMessage mqMessage = new MQMessage();
-            mqMessage.writeString(queueMessage);
-            mqMessage.messageId = config.getMessageID().getBytes();
-            mqMessage.correlationId=config.getCorrelationID().getBytes();
-            mqMessage.setStringProperty("ContentType", contentType);
-            mqMessage.setStringProperty("CHARACTER_SET_ENCODING", charsetEncoding);
+            MQMessage mqMessage = buildMessage(config, queueMessage);
             MQPutMessageOptions pmo = new MQPutMessageOptions();
 
             if (queue == null) {
@@ -76,7 +73,7 @@ public class MQPublish extends AbstractConnector {
                 log.info("queue initialized");
                 queue.put(mqMessage, pmo);
                 queue.close();
-                log.info("Message sucessfully placed at "+config.getQueue()+"queue");
+                log.info("Message sucessfully placed at " + config.getQueue() + "queue");
             }
 
             if (topic == null) {
@@ -85,7 +82,7 @@ public class MQPublish extends AbstractConnector {
                 log.info("topic initialized");
                 topic.put(mqMessage, pmo);
                 topic.close();
-                log.info("Message sucessfully placed at "+config.getTopicName()+"topic");
+                log.info("Message sucessfully placed at " + config.getTopicName() + "topic");
             }
 
             connectionBuilder.closeConnection();
@@ -127,6 +124,43 @@ public class MQPublish extends AbstractConnector {
 
         }
         return publisher;
+    }
+
+    /**
+     * Create mq message
+     */
+    MQMessage buildMessage(MQConfiguration config, String queueMessage) {
+
+        MQMessage mqMessage = new MQMessage();
+
+        //charset and encoding properties
+        mqMessage.encoding = MQENC_NATIVE;
+        mqMessage.format = MQFMT_STRING;
+
+        //setup message IDs
+        mqMessage.messageId = config.getMessageID().getBytes();
+        mqMessage.correlationId = config.getCorrelationID().getBytes();
+        if (config.getgroupID() != null) {
+            mqMessage.groupId = config.getgroupID().getBytes();
+        }
+
+        //set message timestamp
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(new Date(System.currentTimeMillis()));
+        mqMessage.putDateTime = cal;
+
+        try {
+            //Add message properties
+            mqMessage.setStringProperty("ContentType", config.getContentType());
+            mqMessage.setStringProperty("CHARACTER_SET_ENCODING", config.getCharsetEncoding());
+            //write message body
+            mqMessage.writeString(queueMessage);
+        } catch (Exception e) {
+            log.info("Error creating mq message" + e);
+        }
+
+        return mqMessage;
+
     }
 
 }
