@@ -55,6 +55,7 @@ public class MQConfiguration {
     private boolean persistent;
     private int messageType = MQMT_REQUEST;
     private String replyQueue;
+    private int priority;
 
     MQConfiguration(MessageContext msg) {
 
@@ -125,9 +126,15 @@ public class MQConfiguration {
         }
 
         if (msg.getProperty(MQConstants.MAX_CONNECTIONS) != null) {
-            this.maxconnections = Integer.valueOf((String) msg.getProperty(MQConstants.CIPHERSUIT));
+            this.maxconnections = Integer.valueOf((String) msg.getProperty(MQConstants.MAX_CONNECTIONS));
         } else {
             this.maxconnections = 75;
+        }
+
+        if (msg.getProperty(MQConstants.PRIORITY) != null) {
+            this.priority = Integer.valueOf((String) msg.getProperty(MQConstants.PRIORITY));
+        } else {
+            this.priority = -1000;
         }
 
         if (msg.getProperty(MQConstants.MAX_UNUSED_CONNECTIONS) != null) {
@@ -345,5 +352,9 @@ public class MQConfiguration {
 
     public String getreplyQueue() {
         return replyQueue;
+    }
+
+    public int getPriority() {
+        return priority;
     }
 }

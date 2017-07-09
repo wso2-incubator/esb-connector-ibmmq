@@ -46,6 +46,7 @@ public class MQConstants {
     public static final String CORRELATION_ID = "uri.var.correlationID";
     public static final String PERSISTENT = "uri.var.persistent";
     public static final String GROUP_ID = "uri.var.groupID";
+    public static final String PRIORITY = "uri.var.priority";
     public static final String MESSAGE_TYPE = "uri.var.messageType";
     public static final String REPLY_MESSAGE_QUEUE = "uri.var.replyQueue";
     public static final String CONTENT_TYPE = "text/plain";

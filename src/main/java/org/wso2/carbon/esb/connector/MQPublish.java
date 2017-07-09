@@ -173,6 +173,9 @@ public class MQPublish extends AbstractConnector {
         mqMessage.format = MQFMT_STRING;
         mqMessage.messageId = config.getMessageID().getBytes();
         mqMessage.correlationId = config.getCorrelationID().getBytes();
+        if (config.getPriority() != -1000) {
+            mqMessage.priority = config.getPriority();
+        }
         int messageType = config.getMessageType();
         mqMessage.messageType = messageType;
         switch (messageType) {
