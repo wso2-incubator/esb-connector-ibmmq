@@ -14,7 +14,7 @@
 6. For ssl import the certificate to the wso2carbon.jks using following command.
 * keytool -importcert -file <certificate file> -keystore <ESB>/repository/resources/security/wso2carbon.jks -alias "ibmwebspheremqqmanager"
 
-#### Sample proxy service
+#### Sample proxy service without ssl(Including all the parameters)
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <proxy xmlns="http://ws.apache.org/ns/synapse"
@@ -61,7 +61,7 @@
 </proxy>
 
 ```
-#### Sample proxy service with ssl(with all the parameters defined)
+#### Sample proxy service with ssl(Including all the parameters)
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
