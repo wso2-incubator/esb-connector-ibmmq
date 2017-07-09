@@ -40,6 +40,8 @@
     <parameter name="messageID" description="message id"/>
     <parameter name="correlationID" description="correlation id"/>
     <parameter name="groupID" description="group id"/>
+    <parameter name="replyQueue" description="reply queue"/>
+    <parameter name="messageType" description="Type of message"/>
     <sequence>
         <property expression="$func:username" name="uri.var.username" scope="default" type="STRING"/>
         <property expression="$func:password" name="uri.var.password" scope="default" type="STRING"/>
@@ -64,7 +66,8 @@
         <property expression="$func:keyPassword" name="uri.var.keyPassword" scope="default" type="STRING"/>
         <property expression="$func:correlationID" name="uri.var.correlationID" scope="default" type="STRING"/>
         <property expression="$func:messageID" name="uri.var.messageID" scope="default" type="STRING"/>
-        <property expression="$func:groupID" name="uri.var.ggroupID" scope="default" type="STRING"/>
-
+        <property expression="$func:groupID" name="uri.var.groupID" scope="default" type="STRING"/>
+        <property expression="$func:messageType" name="uri.var.messageType" scope="default" type="STRING"/>
+        <property expression="$func:replyQueue" name="uri.var.replyQueue" scope="default" type="STRING"/>
     </sequence>
 </template>

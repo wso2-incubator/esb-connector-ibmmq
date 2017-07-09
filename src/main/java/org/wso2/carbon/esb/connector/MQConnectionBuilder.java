@@ -23,6 +23,8 @@ import com.ibm.mq.MQQueueManager;
 import com.ibm.mq.MQSimpleConnectionManager;
 import com.ibm.mq.constants.CMQC;
 import com.ibm.mq.constants.CMQXC;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -37,6 +39,8 @@ import java.util.Vector;
  * Start connection with IBM MQ queue manager
  */
 public class MQConnectionBuilder {
+
+    private static final Log logger = LogFactory.getLog(MQConnectionBuilder.class);
 
     private static MQQueueManager queueManager;
 
@@ -63,13 +67,13 @@ public class MQConnectionBuilder {
         Collection headerComp = new Vector();
         headerComp.add(new Integer(CMQXC.MQCOMPRESS_SYSTEM));
         MQEnvironment.hdrCompList = headerComp;
-
         MQEnvironment.setDefaultConnectionManager(customizedPool(config.getTimeout(), config.getmaxConnections(), config.getmaxnusedConnections()));
 
         try {
             queueManager = new MQQueueManager(config.getqManger());
+            logger.info("Queue Manager initialized");
         } catch (MQException e) {
-            e.printStackTrace();
+            logger.info("Error initializing queue manager " + e);
         }
     }
 
@@ -81,7 +85,7 @@ public class MQConnectionBuilder {
             try {
                 queueManager = new MQQueueManager(config.getqManger());
             } catch (MQException e) {
-
+                logger.error("Error getting queue manager " + e);
             }
         }
         return queueManager;

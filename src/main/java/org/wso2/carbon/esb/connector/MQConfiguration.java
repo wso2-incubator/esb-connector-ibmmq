@@ -20,6 +20,8 @@ package org.wso2.carbon.esb.connector;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 
+import static com.ibm.mq.constants.CMQC.*;
+
 /**
  * IBM MQ configuration parameters
  */
@@ -39,7 +41,7 @@ public class MQConfiguration {
     private int maxconnections;
     private int maxunusedconnections;
     private String ciphersuit;
-    private Boolean flipRequired;
+    private boolean flipRequired;
     private boolean sslEnable;
     private String trustStore;
     private String trustPassword;
@@ -50,19 +52,22 @@ public class MQConfiguration {
     private String groupID;
     private String contentType;
     private String charsetEncoding;
+    private boolean persistent;
+    private int messageType = MQMT_REQUEST;
+    private String replyQueue;
 
     MQConfiguration(MessageContext msg) {
 
-        if(((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("ContentType")!=null){
-            this.contentType=(String) ((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("ContentType");
-        }else{
-            this.contentType=MQConstants.CONTENT_TYPE;
+        if (((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("ContentType") != null) {
+            this.contentType = (String) ((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("ContentType");
+        } else {
+            this.contentType = MQConstants.CONTENT_TYPE;
         }
 
-        if(((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("CHARACTER_SET_ENCODING")!=null){
-            this.charsetEncoding=(String) ((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("CHARACTER_SET_ENCODING");
-        }else{
-            this.charsetEncoding=MQConstants.CHARSET_ENCODING;
+        if (((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("CHARACTER_SET_ENCODING") != null) {
+            this.charsetEncoding = (String) ((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("CHARACTER_SET_ENCODING");
+        } else {
+            this.charsetEncoding = MQConstants.CHARSET_ENCODING;
         }
 
         if (msg.getProperty(MQConstants.PORT) != null) {
@@ -75,6 +80,25 @@ public class MQConfiguration {
             this.topicName = (String) msg.getProperty(MQConstants.TOPIC_NAME);
         } else {
             this.topicName = null;
+        }
+
+        String messageTypeString = (String) msg.getProperty(MQConstants.MESSAGE_TYPE);
+        if (messageTypeString != null) {
+            if (messageTypeString.equals("MQMT_REQUEST")) {
+                this.messageType = MQMT_REQUEST;
+            } else if (messageTypeString.equals("MQMT_DATAGRAM")) {
+                this.messageType = MQMT_DATAGRAM;
+            } else if (messageTypeString.equals("MQMT_REPLY")) {
+                this.messageType = MQMT_REPLY;
+            } else if (messageTypeString.equals("MQMT_REPORT")) {
+                this.messageType = MQMT_REPORT;
+            }
+        }
+
+        if (msg.getProperty(MQConstants.REPLY_MESSAGE_QUEUE) != null) {
+            this.replyQueue = (String) msg.getProperty(MQConstants.REPLY_MESSAGE_QUEUE);
+        } else {
+            this.replyQueue = "result";
         }
 
         if (msg.getProperty(MQConstants.TOPIC_STRING) != null) {
@@ -122,6 +146,12 @@ public class MQConfiguration {
             this.flipRequired = Boolean.valueOf((String) msg.getProperty(MQConstants.FLIP_REQUIRED));
         } else {
             this.flipRequired = false;
+        }
+
+        if (msg.getProperty(MQConstants.PERSISTENT) != null) {
+            this.persistent = Boolean.valueOf((String) msg.getProperty(MQConstants.PERSISTENT));
+        } else {
+            this.persistent = false;
         }
 
         if (msg.getProperty(MQConstants.TRUST_STORE) != null) {
@@ -303,5 +333,17 @@ public class MQConfiguration {
 
     public String getCharsetEncoding() {
         return charsetEncoding;
+    }
+
+    public boolean isPersistent() {
+        return persistent;
+    }
+
+    public int getMessageType() {
+        return messageType;
+    }
+
+    public String getreplyQueue() {
+        return replyQueue;
     }
 }

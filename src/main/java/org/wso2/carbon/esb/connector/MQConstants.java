@@ -44,7 +44,11 @@ public class MQConstants {
     public static final String KEY_PASSWORD = "uri.var.keyPassword";
     public static final String MESSAGE_ID = "uri.var.messageID";
     public static final String CORRELATION_ID = "uri.var.correlationID";
+    public static final String PERSISTENT = "uri.var.persistent";
     public static final String GROUP_ID = "uri.var.groupID";
+    public static final String MESSAGE_TYPE = "uri.var.messageType";
+    public static final String REPLY_MESSAGE_QUEUE = "uri.var.replyQueue";
     public static final String CONTENT_TYPE = "text/plain";
-    public static final String CHARSET_ENCODING = "UTF8";
+    public static final String CHARSET_ENCODING = "UTF-8";
+    public static final String DEFAULT_CONTENT_TYPE = "text/plain";
 }

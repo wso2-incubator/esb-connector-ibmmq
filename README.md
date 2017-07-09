@@ -23,24 +23,28 @@
     <target>
         <inSequence>
             <ibmmq.init>
-                <username>{websphere mq user}</username>
-                <password>{websphere mq user password}</password>
-                <topicname>{websphere mq user topicname}</topicname>
-                <topicstring>{websphere mq user topicpassword}</topicstring>
-                <port>1414</port>
-                <host>127.0.0.1</host>
-                <qmanager>{websphere mq queue manager name}</qmanager>
-                <channel>{websphere mq channel name}</channel>
-                <transportType>1</transportType>
-                <timeout>360000</timeOut>
-                <maxconnections>75</maxconnections>
-                <maxunusedconnections>50</maxunusedconnections>
-                <sslEnable>false</sslEnable>
-                <messageID>{preffered message ID}</messageID>
-                <correlationID>{preffered correlation ID}</correlationID>
-                <groupID>{preffered group ID}</groupID>
+                        <username>mqm</username>
+                        <password>upgs5423</password>
+                        <port>1414</port>
+                        <host>127.0.0.1</host>
+                        <qmanager>qmanager</qmanager>
+                        <queue>myqueue</queue>
+                        <topicname>mytopic</topicname>
+                        <topicstring>topic</topicstring>
+                        <channel>PASSWORD.SVRCONN</channel>
+                        <transportType>1</transportType>
+                        <timeOut>1000</timeOut>
+                        <sslEnable>false</sslEnable>
+                        <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
+                        <flipsRequired>false</flipsRequired>
+                        <trustStore>wso2carbon.jks</trustStore>
+                        <trustPassword>wso2carbon</trustPassword>
+                        <keyStore>wso2carbon.jks</keyStore>
+                        <keyPassword>wso2carbon</keyPassword>
+                        <replyQueue>result</replyQueue>
             </ibmmq.init>
             <ibmmq.sendmessage/>
+            <log level="full"/>
         </inSequence>
     </target>
     <description/>
@@ -57,28 +61,25 @@
     <target>
         <inSequence>
             <ibmmq.init>
-                <username>{websphere mq user}</username>
-                <password>{websphere mq user password}</password>
-                <topicname>{websphere mq user topicname}</topicname>
-                <topicstring>{websphere mq user topicpassword}</topicstring>
-                <port>1414</port>
-                <host>127.0.0.1</host>
-                <qmanager>{websphere mq queue manager name}</qmanager>
-                <channel>{websphere mq channel name}</channel>
-                <transportType>1</transportType>
-                <timeout>360000</timeOut>
-                <maxconnections>75</maxconnections>
-                <maxunusedconnections>50</maxunusedconnections>
-                <sslEnable>true</sslEnable>
-                <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
-                <flipsRequired>false</flipsRequired>
-                <trustStore>wso2carbon.jks</trustStore>
-                <trustPassword>wso2carbon</trustPassword>
-                <keyStore>wso2carbon.jks</keyStore>
-                <keyPassword>wso2carbon</keyPassword>
-                <messageID>{preffered message ID}</messageID>
-                <correlationID>{preffered correlation ID}</correlationID>
-                <groupID>{preffered group ID}</groupID>
+                        <username>mqm</username>
+                        <password>upgs5423</password>
+                        <port>1414</port>
+                        <host>127.0.0.1</host>
+                        <qmanager>qmanager</qmanager>
+                        <queue>myqueue</queue>
+                        <topicname>mytopic</topicname>
+                        <topicstring>topic</topicstring>
+                        <channel>PASSWORD.SVRCONN</channel>
+                        <transportType>1</transportType>
+                        <timeOut>1000</timeOut>
+                        <sslEnable>true</sslEnable>
+                        <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
+                        <flipsRequired>false</flipsRequired>
+                        <trustStore>wso2carbon.jks</trustStore>
+                        <trustPassword>wso2carbon</trustPassword>
+                        <keyStore>wso2carbon.jks</keyStore>
+                        <keyPassword>wso2carbon</keyPassword>
+                        <replyQueue>result</replyQueue>
             </ibmmq.init>
             <ibmmq.sendmessage/>
             <log level="full"/>
