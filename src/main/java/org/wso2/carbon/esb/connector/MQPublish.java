@@ -174,17 +174,17 @@ public class MQPublish extends AbstractConnector {
         mqMessage.messageId = config.getMessageID().getBytes();
         mqMessage.correlationId = config.getCorrelationID().getBytes();
         int messageType = config.getMessageType();
+        mqMessage.messageType = messageType;
         switch (messageType) {
             case 1://request message
                 String replyQueue = config.getreplyQueue();
                 if (replyQueue != null) {
-                    mqMessage.messageType = messageType;
                     mqMessage.replyToQueueName = replyQueue;
                     mqMessage.report = CMQC.MQRO_COA_WITH_FULL_DATA | CMQC.MQRO_EXCEPTION_WITH_FULL_DATA | CMQC.MQRO_COD_WITH_FULL_DATA | CMQC.MQRO_EXPIRATION_WITH_FULL_DATA;
                     MQQueue reply;
                     reply = setQueue(this.connectionBuilder, this.config, 1);
                     if (reply != null) {
-                        getReplyMessage(reply, this.config, msgCtx);
+                        getReplyMessage(reply, this.config, msgCtx, 0);
                     }
                 } else {
                     log.info("Reply queue not specified");
@@ -192,11 +192,22 @@ public class MQPublish extends AbstractConnector {
                 break;
             case 2://reply message
                 break;
-            case 4://report message
-                break;
-            case 8://datagram
+            case 4://report message else datagram
+                String reportQueue = config.getreplyQueue();
+                if (reportQueue != null) {
+                    mqMessage.replyToQueueName = reportQueue;
+                    mqMessage.report = CMQC.MQRO_COA_WITH_FULL_DATA | CMQC.MQRO_EXCEPTION_WITH_FULL_DATA | CMQC.MQRO_COD_WITH_FULL_DATA | CMQC.MQRO_EXPIRATION_WITH_FULL_DATA;
+                    MQQueue reply;
+                    reply = setQueue(this.connectionBuilder, this.config, 1);
+                    if (reply != null) {
+                        getReplyMessage(reply, this.config, msgCtx, 1);
+                    }
+                } else {
+                    log.info("Reply queue not specified");
+                }
                 break;
         }
+
         if (config.isPersistent()) {
             mqMessage.persistence = MQPER_PERSISTENT;
         } else {
@@ -205,23 +216,25 @@ public class MQPublish extends AbstractConnector {
         if (config.getgroupID() != null) {
             mqMessage.groupId = config.getgroupID().getBytes();
         }
+
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(new Date(System.currentTimeMillis()));
         mqMessage.putDateTime = cal;
-        try {
 
+        try {
             mqMessage.setStringProperty("ContentType", config.getContentType());
             mqMessage.setStringProperty("CHARACTER_SET_ENCODING", config.getCharsetEncoding());
             mqMessage.writeString(queueMessage);
         } catch (Exception e) {
             log.info("Error creating mq message" + e);
         }
-
         return mqMessage;
-
     }
 
-    void getReplyMessage(final MQQueue replyQueue, MQConfiguration config, final MessageContext msgCtx) {
+    /**
+     * Get reply message
+     */
+    void getReplyMessage(final MQQueue replyQueue, MQConfiguration config, final MessageContext msgCtx, final int msgFlag) {
 
         final MQMessage message = new MQMessage();
         final MQGetMessageOptions gmo = new MQGetMessageOptions();
@@ -241,11 +254,16 @@ public class MQPublish extends AbstractConnector {
                         md.copyFrom(message);
                         int strLen = message.getDataLength();
                         String cType = message.getStringProperty("usr.ContentType") != null ? message.getStringProperty("usr.ContentType") : org.wso2.carbon.esb.connector.MQConstants.CONTENT_TYPE;
-                        msgCtx.setProperty("Format", md.getFormat());
-                        msgCtx.setProperty("Feedback", md.getFeedback());
                         byte[] strData = new byte[strLen];
                         message.readFully(strData);
-                        buildreplyMessage(new String(strData), cType, msgCtx);
+                        if (msgFlag == 0) {
+                            msgCtx.setProperty("Format", md.getFormat());
+                            msgCtx.setProperty("Feedback", md.getFeedback());
+                            msgCtx.setProperty("QueueMgr_Report", reportStr(md.getFeedback()));
+                            buildreplyMessage(new String(strData), cType, msgCtx);
+                        } else if (msgFlag == 1) {
+                            log.info("Received report details-" + reportStr(md.getFeedback()));
+                        }
                         log.info("Reply received");
                         break;
                     } catch (MQException e) {
@@ -260,7 +278,7 @@ public class MQPublish extends AbstractConnector {
     }
 
     /**
-     * Create reply message if message typr is request
+     * Create reply message if message type is request
      */
     void buildreplyMessage(String strMessage, String contentType, MessageContext msgCtx) {
         AutoCloseInputStream in = new AutoCloseInputStream(new ByteArrayInputStream(strMessage.getBytes()));
@@ -281,6 +299,46 @@ public class MQPublish extends AbstractConnector {
 
         } catch (AxisFault axisFault) {
             axisFault.printStackTrace();
+        }
+    }
+
+    /**
+     * generate report details
+     */
+    String reportStr(int code) {
+        switch (code) {
+            case MQFB_EXPIRATION:
+                return MQReportConstants.MQFB_EXPIRATION;
+            case MQFB_COA:
+                return MQReportConstants.MQFB_COA;
+            case MQFB_COD:
+                return MQReportConstants.MQFB_COD;
+            case MQFB_QUIT:
+                return MQReportConstants.MQFB_QUIT;
+            case MQFB_APPL_CANNOT_BE_STARTED:
+                return MQReportConstants.MQFB_APPL_CANNOT_BE_STARTED;
+            case MQFB_TM_ERROR:
+                return MQReportConstants.MQFB_TM_ERROR;
+            case MQFB_APPL_TYPE_ERROR:
+                return MQReportConstants.MQFB_APPL_TYPE_ERROR;
+            case MQFB_STOPPED_BY_MSG_EXIT:
+                return MQReportConstants.MQFB_STOPPED_BY_MSG_EXIT;
+            case MQFB_XMIT_Q_MSG_ERROR:
+                return MQReportConstants.MQFB_XMIT_Q_MSG_ERROR;
+            case MQFB_ACTIVITY:
+                return MQReportConstants.MQFB_ACTIVITY;
+            case MQFB_MAX_ACTIVITIES:
+                return MQReportConstants.MQFB_MAX_ACTIVITIES;
+            case MQFB_NOT_FORWARDED:
+                return MQReportConstants.MQFB_NOT_FORWARDED;
+            case MQFB_NOT_DELIVERED:
+                return MQReportConstants.MQFB_NOT_DELIVERED;
+            case MQFB_UNSUPPORTED_FORWARDING:
+                return MQReportConstants.MQFB_UNSUPPORTED_FORWARDING;
+            case MQFB_UNSUPPORTED_DELIVERY:
+                return MQReportConstants.MQFB_UNSUPPORTED_DELIVERY;
+            default://MQFB_NONE
+                return MQReportConstants.MQFB_NONE;
         }
     }
 }
