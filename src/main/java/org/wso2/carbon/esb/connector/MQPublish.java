@@ -51,8 +51,8 @@ public class MQPublish extends AbstractConnector {
 
     MQConnectionBuilder connectionBuilder;
     MQConfiguration config;
-    String qname="";
-    String topicname="";
+    String qname = "";
+    String topicname = "";
     MQQueue queue = null;
     MQTopic topic = null;
 
@@ -73,29 +73,29 @@ public class MQPublish extends AbstractConnector {
             connectionBuilder = new MQConnectionBuilder(messageContext);
             config = connectionBuilder.getConfig();
 
-            String newqueue=config.getQueue();
-            String newtopic=config.getTopicName();
+            String newqueue = config.getQueue();
+            String newtopic = config.getTopicName();
 
             if (newqueue != null) {
-                if(!newqueue.equals(qname) && queue!=null) {
+                if (!newqueue.equals(qname) && queue != null) {
                     queue.close();
                     queue = setQueue(connectionBuilder, config, 0);
-                }else if(!newqueue.equals(qname) || queue==null){
+                } else if (!newqueue.equals(qname) || queue == null) {
                     queue = setQueue(connectionBuilder, config, 0);
                 }
             }
 
             if (newtopic != null) {
-                if(!newtopic.equals(topicname) && topic!=null) {
+                if (!newtopic.equals(topicname) && topic != null) {
                     topic.close();
                     topic = setTopic(connectionBuilder, config);
-                }else if(!newtopic.equals(topicname) || topic==null){
+                } else if (!newtopic.equals(topicname) || topic == null) {
                     topic = setTopic(connectionBuilder, config);
                 }
             }
 
-            qname=config.getQueue();
-            topicname=config.getTopicName();
+            qname = config.getQueue();
+            topicname = config.getTopicName();
 
             MQMessage mqMessage = buildMessage(config, queueMessage, messageContext);
 
@@ -159,7 +159,6 @@ public class MQPublish extends AbstractConnector {
         } catch (MQException e) {
             log.error("Error creating topic" + e);
             return null;
-
         }
         return publisher;
     }
@@ -185,7 +184,7 @@ public class MQPublish extends AbstractConnector {
                     MQQueue reply;
                     reply = setQueue(this.connectionBuilder, this.config, 1);
                     if (reply != null) {
-                        getReplyMessage(reply, this.config,msgCtx);
+                        getReplyMessage(reply, this.config, msgCtx);
                     }
                 } else {
                     log.info("Reply queue not specified");
@@ -241,9 +240,9 @@ public class MQPublish extends AbstractConnector {
                         MQMD md = new MQMD();
                         md.copyFrom(message);
                         int strLen = message.getDataLength();
-                        String cType=message.getStringProperty("usr.ContentType")!=null?message.getStringProperty("usr.ContentType"): org.wso2.carbon.esb.connector.MQConstants.CONTENT_TYPE;
-                        msgCtx.setProperty("Format",md.getFormat());
-                        msgCtx.setProperty("Feedback",md.getFeedback());
+                        String cType = message.getStringProperty("usr.ContentType") != null ? message.getStringProperty("usr.ContentType") : org.wso2.carbon.esb.connector.MQConstants.CONTENT_TYPE;
+                        msgCtx.setProperty("Format", md.getFormat());
+                        msgCtx.setProperty("Feedback", md.getFeedback());
                         byte[] strData = new byte[strLen];
                         message.readFully(strData);
                         buildreplyMessage(new String(strData), cType, msgCtx);
@@ -260,6 +259,9 @@ public class MQPublish extends AbstractConnector {
         executorService.shutdown();
     }
 
+    /**
+     * Create reply message if message typr is request
+     */
     void buildreplyMessage(String strMessage, String contentType, MessageContext msgCtx) {
         AutoCloseInputStream in = new AutoCloseInputStream(new ByteArrayInputStream(strMessage.getBytes()));
         try {
