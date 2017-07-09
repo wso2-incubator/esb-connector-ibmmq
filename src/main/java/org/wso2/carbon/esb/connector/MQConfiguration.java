@@ -53,7 +53,7 @@ public class MQConfiguration {
     private String contentType;
     private String charsetEncoding;
     private boolean persistent;
-    private int messageType = MQMT_REQUEST;
+    private int messageType = MQMT_DATAGRAM;
     private String replyQueue;
     private int priority;
 

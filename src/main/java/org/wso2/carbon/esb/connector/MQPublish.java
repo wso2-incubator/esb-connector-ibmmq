@@ -182,7 +182,6 @@ public class MQPublish extends AbstractConnector {
             case 1://request message
                 String replyQueue = config.getreplyQueue();
                 if (replyQueue != null) {
-                    mqMessage.replyToQueueName = replyQueue;
                     mqMessage.report = CMQC.MQRO_COA_WITH_FULL_DATA | CMQC.MQRO_EXCEPTION_WITH_FULL_DATA | CMQC.MQRO_COD_WITH_FULL_DATA | CMQC.MQRO_EXPIRATION_WITH_FULL_DATA;
                     MQQueue reply;
                     reply = setQueue(this.connectionBuilder, this.config, 1);

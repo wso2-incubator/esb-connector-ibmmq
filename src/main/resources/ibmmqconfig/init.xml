@@ -43,6 +43,7 @@
     <parameter name="replyQueue" description="reply queue"/>
     <parameter name="messageType" description="Type of message"/>
     <parameter name="priority" description="Priority of the message"/>
+    <parameter name="persistent" description="Message is persistent or not"/>
     <sequence>
         <property expression="$func:username" name="uri.var.username" scope="default" type="STRING"/>
         <property expression="$func:password" name="uri.var.password" scope="default" type="STRING"/>
@@ -71,5 +72,6 @@
         <property expression="$func:messageType" name="uri.var.messageType" scope="default" type="STRING"/>
         <property expression="$func:replyQueue" name="uri.var.replyQueue" scope="default" type="STRING"/>
         <property expression="$func:priority" name="uri.var.priority" scope="default" type="STRING"/>
+        <property expression="$func:persistent" name="uri.var.persistent" scope="default" type="STRING"/>
     </sequence>
 </template>
