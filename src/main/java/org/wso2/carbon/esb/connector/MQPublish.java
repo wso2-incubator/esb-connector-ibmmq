@@ -179,30 +179,17 @@ public class MQPublish extends AbstractConnector {
         int messageType = config.getMessageType();
         mqMessage.messageType = messageType;
         switch (messageType) {
-            case 1://request message
-                String replyQueue = config.getreplyQueue();
-                if (replyQueue != null) {
-                    mqMessage.report = CMQC.MQRO_COA_WITH_FULL_DATA | CMQC.MQRO_EXCEPTION_WITH_FULL_DATA | CMQC.MQRO_COD_WITH_FULL_DATA | CMQC.MQRO_EXPIRATION_WITH_FULL_DATA;
-                    MQQueue reply;
-                    reply = setQueue(this.connectionBuilder, this.config, 1);
-                    if (reply != null) {
-                        getReplyMessage(reply, this.config, msgCtx, 0);
-                    }
-                } else {
-                    log.info("Reply queue not specified");
-                }
-                break;
             case 2://reply message
                 break;
-            case 4://report message else datagram
+            case 4://report message
                 String reportQueue = config.getreplyQueue();
                 if (reportQueue != null) {
                     mqMessage.replyToQueueName = reportQueue;
                     mqMessage.report = CMQC.MQRO_COA_WITH_FULL_DATA | CMQC.MQRO_EXCEPTION_WITH_FULL_DATA | CMQC.MQRO_COD_WITH_FULL_DATA | CMQC.MQRO_EXPIRATION_WITH_FULL_DATA;
                     MQQueue reply;
-                    reply = setQueue(this.connectionBuilder, this.config, 1);
+                    reply = setQueue(this.connectionBuilder, this.config,1);
                     if (reply != null) {
-                        getReplyMessage(reply, this.config, msgCtx, 1);
+                        getReplyMessage(reply, this.config, msgCtx);
                     }
                 } else {
                     log.info("Reply queue not specified");
@@ -236,7 +223,7 @@ public class MQPublish extends AbstractConnector {
     /**
      * Get reply message
      */
-    void getReplyMessage(final MQQueue replyQueue, MQConfiguration config, final MessageContext msgCtx, final int msgFlag) {
+    void getReplyMessage(final MQQueue replyQueue, MQConfiguration config, final MessageContext msgCtx) {
 
         final MQMessage message = new MQMessage();
         final MQGetMessageOptions gmo = new MQGetMessageOptions();
@@ -260,7 +247,7 @@ public class MQPublish extends AbstractConnector {
                         message.readFully(strData);
                         msgCtx.setProperty("Format", md.getFormat());
                         msgCtx.setProperty("Feedback", md.getFeedback());
-                        msgCtx.setProperty("QueueMgr_Report", reportStr(md.getFeedback()));
+                        msgCtx.setProperty("Report", reportStr(md.getFeedback()));
                         buildreplyMessage(new String(strData), cType, msgCtx);
                         log.info("Received report details-" + reportStr(md.getFeedback()));
                         break;
