@@ -56,6 +56,7 @@ public class MQConfiguration {
     private int messageType = MQMT_DATAGRAM;
     private String replyQueue;
     private int priority;
+    private String endpoint;
 
     MQConfiguration(MessageContext msg) {
 
@@ -100,6 +101,12 @@ public class MQConfiguration {
             this.replyQueue = (String) msg.getProperty(MQConstants.REPLY_MESSAGE_QUEUE);
         } else {
             this.replyQueue = "result";
+        }
+
+        if (msg.getProperty(MQConstants.ENDPOINT) != null) {
+            this.endpoint = (String) msg.getProperty(MQConstants.ENDPOINT);
+        } else {
+            this.endpoint = null;
         }
 
         if (msg.getProperty(MQConstants.TOPIC_STRING) != null) {
@@ -356,5 +363,9 @@ public class MQConfiguration {
 
     public int getPriority() {
         return priority;
+    }
+
+    public String getEndpoint() {
+        return endpoint;
     }
 }

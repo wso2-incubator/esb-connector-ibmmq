@@ -339,7 +339,7 @@ public class MQPublish extends AbstractConnector {
                 return MQReportConstants.MQFB_UNSUPPORTED_FORWARDING;
             case MQFB_UNSUPPORTED_DELIVERY:
                 return MQReportConstants.MQFB_UNSUPPORTED_DELIVERY;
-            default://MQFB_NONE
+            default:
                 return MQReportConstants.MQFB_NONE;
         }
     }
