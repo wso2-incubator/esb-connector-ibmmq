@@ -241,20 +241,13 @@ public class MQPublish extends AbstractConnector {
                         replyQueue.get(message, gmo);
                         MQMD md = new MQMD();
                         md.copyFrom(message);
-                        int strLen = message.getDataLength();
-                        String cType = message.getStringProperty("usr.ContentType") != null ? message.getStringProperty("usr.ContentType") : org.wso2.carbon.esb.connector.MQConstants.CONTENT_TYPE;
-                        byte[] strData = new byte[strLen];
-                        message.readFully(strData);
                         msgCtx.setProperty("Format", md.getFormat());
                         msgCtx.setProperty("Feedback", md.getFeedback());
-                        msgCtx.setProperty("Report", reportStr(md.getFeedback()));
-                        buildreplyMessage(new String(strData), cType, msgCtx);
-                        log.info("Received report details-" + reportStr(md.getFeedback()));
+                        buildreplyMessage(reportStr(md.getFeedback()), "text/plain", msgCtx);
+                        log.info("Report-" + reportStr(md.getFeedback()));
                         break;
                     } catch (MQException e) {
                         log.info("Waiting for reply message");
-                    } catch (IOException e) {
-                        log.info("Error retrieving data from reply message");
                     }
                 }
             }
@@ -263,7 +256,7 @@ public class MQPublish extends AbstractConnector {
     }
 
     /**
-     * Create reply message if message type is request
+     * Create reply message if message type is report
      */
     void buildreplyMessage(String strMessage, String contentType, MessageContext msgCtx) {
         AutoCloseInputStream in = new AutoCloseInputStream(new ByteArrayInputStream(strMessage.getBytes()));
