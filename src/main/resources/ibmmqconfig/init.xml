@@ -73,6 +73,5 @@
         <property expression="$func:replyQueue" name="uri.var.replyQueue" scope="default" type="STRING"/>
         <property expression="$func:priority" name="uri.var.priority" scope="default" type="STRING"/>
         <property expression="$func:persistent" name="uri.var.persistent" scope="default" type="STRING"/>
-        <property expression="$func:endpoint" name="uri.var.endpoint" scope="default" type="STRING"/>
     </sequence>
 </template>

@@ -37,7 +37,6 @@
                 <topicstring>topic</topicstring>
                 <transportType>1</transportType>
                 <messageType>MQMT_DATAGRAM</messageType>
-                <endpoint>{endpoint for request message}</endpoint>
                 <persistent>true</persistent>
                 <priority>3</priority>>
                 <maxconnections>75</maxconnections>
@@ -86,7 +85,6 @@
                 <topicstring>topic</topicstring>
                 <transportType>1</transportType>
                 <messageType>MQMT_DATAGRAM</messageType>
-                <endpoint>{endpoint for request message}</endpoint>
                 <persistent>true</persistent>
                 <priority>3</priority>>
                 <maxconnections>75</maxconnections>

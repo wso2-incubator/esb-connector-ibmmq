@@ -49,7 +49,6 @@ public class MQConstants {
     public static final String PRIORITY = "uri.var.priority";
     public static final String MESSAGE_TYPE = "uri.var.messageType";
     public static final String REPLY_MESSAGE_QUEUE = "uri.var.replyQueue";
-    public static final String ENDPOINT = "uri.var.endpoint";
     public static final String CONTENT_TYPE = "text/plain";
     public static final String CHARSET_ENCODING = "UTF-8";
     public static final String DEFAULT_CONTENT_TYPE = "text/plain";

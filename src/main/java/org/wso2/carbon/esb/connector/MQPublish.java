@@ -258,15 +258,11 @@ public class MQPublish extends AbstractConnector {
                         String cType = message.getStringProperty("usr.ContentType") != null ? message.getStringProperty("usr.ContentType") : org.wso2.carbon.esb.connector.MQConstants.CONTENT_TYPE;
                         byte[] strData = new byte[strLen];
                         message.readFully(strData);
-                        if (msgFlag == 0) {
-                            msgCtx.setProperty("Format", md.getFormat());
-                            msgCtx.setProperty("Feedback", md.getFeedback());
-                            msgCtx.setProperty("QueueMgr_Report", reportStr(md.getFeedback()));
-                            buildreplyMessage(new String(strData), cType, msgCtx);
-                        } else if (msgFlag == 1) {
-                            log.info("Received report details-" + reportStr(md.getFeedback()));
-                        }
-                        log.info("Reply received");
+                        msgCtx.setProperty("Format", md.getFormat());
+                        msgCtx.setProperty("Feedback", md.getFeedback());
+                        msgCtx.setProperty("QueueMgr_Report", reportStr(md.getFeedback()));
+                        buildreplyMessage(new String(strData), cType, msgCtx);
+                        log.info("Received report details-" + reportStr(md.getFeedback()));
                         break;
                     } catch (MQException e) {
                         log.info("Waiting for reply message");
