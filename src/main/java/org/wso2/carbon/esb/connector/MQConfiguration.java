@@ -50,26 +50,12 @@ public class MQConfiguration {
     private String messageID;
     private String correlationID;
     private String groupID;
-    private String contentType;
-    private String charsetEncoding;
     private boolean persistent;
-    private int messageType = MQMT_DATAGRAM;
+    private int messageType = MQMT_REQUEST;
     private String replyQueue;
     private int priority;
 
     MQConfiguration(MessageContext msg) {
-
-        if (((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("ContentType") != null) {
-            this.contentType = (String) ((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("ContentType");
-        } else {
-            this.contentType = MQConstants.CONTENT_TYPE;
-        }
-
-        if (((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("CHARACTER_SET_ENCODING") != null) {
-            this.charsetEncoding = (String) ((Axis2MessageContext) msg).getAxis2MessageContext().getProperty("CHARACTER_SET_ENCODING");
-        } else {
-            this.charsetEncoding = MQConstants.CHARSET_ENCODING;
-        }
 
         if (msg.getProperty(MQConstants.PORT) != null) {
             this.port = Integer.valueOf((String) msg.getProperty(MQConstants.PORT));
@@ -89,8 +75,6 @@ public class MQConfiguration {
                 this.messageType = MQMT_REQUEST;
             } else if (messageTypeString.equals("MQMT_DATAGRAM")) {
                 this.messageType = MQMT_DATAGRAM;
-            } else if (messageTypeString.equals("MQMT_REPLY")) {
-                this.messageType = MQMT_REPLY;
             } else if (messageTypeString.equals("MQMT_REPORT")) {
                 this.messageType = MQMT_REPORT;
             }
@@ -332,14 +316,6 @@ public class MQConfiguration {
 
     public String getgroupID() {
         return groupID;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public String getCharsetEncoding() {
-        return charsetEncoding;
     }
 
     public boolean isPersistent() {

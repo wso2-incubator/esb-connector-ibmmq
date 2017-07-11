@@ -39,6 +39,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -51,8 +53,6 @@ public class MQPublish extends AbstractConnector {
 
     MQConnectionBuilder connectionBuilder;
     MQConfiguration config;
-    String qname = "";
-    String topicname = "";
     MQQueue queue = null;
     MQTopic topic = null;
 
@@ -61,6 +61,8 @@ public class MQPublish extends AbstractConnector {
         try {
 
             log.info("Message received at ibm-mq connector");
+            connectionBuilder = new MQConnectionBuilder(messageContext);
+            config = connectionBuilder.getConfig();
 
             SOAPEnvelope soapEnvelope = messageContext.getEnvelope();
             OMElement getElement = soapEnvelope.getBody().getFirstElement();
@@ -70,45 +72,33 @@ public class MQPublish extends AbstractConnector {
                 queueMessage = getElement.toString();
             }
 
-            connectionBuilder = new MQConnectionBuilder(messageContext);
-            config = connectionBuilder.getConfig();
+            int messageType = config.getMessageType();
+            MQMessage mqMessage;
 
-            String newqueue = config.getQueue();
-            String newtopic = config.getTopicName();
-
-            if (newqueue != null) {
-                if (!newqueue.equals(qname) && queue != null) {
-                    queue.close();
-                    queue = setQueue(connectionBuilder, config, 0);
-                } else if (!newqueue.equals(qname) || queue == null) {
-                    queue = setQueue(connectionBuilder, config, 0);
-                }
+            if(config.getQueue()!=null) {
+                queue = setQueue(connectionBuilder, config);
+            }
+            if(config.getTopicName()!=null) {
+                topic = setTopic(connectionBuilder, config);
+            }
+            switch(messageType){
+                case 4:
+                    mqMessage= buildReportMessage(config, queueMessage, messageContext);
+                    break;
+                default:
+                    mqMessage = buildDatagramOrRequestMessage(config, queueMessage, messageContext);
             }
 
-            if (newtopic != null) {
-                if (!newtopic.equals(topicname) && topic != null) {
-                    topic.close();
-                    topic = setTopic(connectionBuilder, config);
-                } else if (!newtopic.equals(topicname) || topic == null) {
-                    topic = setTopic(connectionBuilder, config);
-                }
-            }
-
-            qname = config.getQueue();
-            topicname = config.getTopicName();
-
-            MQMessage mqMessage = buildMessage(config, queueMessage, messageContext);
-
-            if (queue == null) {
-                log.error("Cannot write to queue.Error in queue.");
+            if (queue == null || mqMessage==null) {
+                log.error("Error in publishing message");
             } else {
                 log.info("queue initialized");
                 queue.put(mqMessage);
                 log.info("Message successfully placed at " + config.getQueue() + "queue");
             }
 
-            if (topic == null) {
-                log.info("Cannot write to topic.Error in topic.");
+            if (topic == null || mqMessage==null) {
+                log.error("Error in publishing message");
             } else {
                 log.info("topic initialized");
                 topic.put(mqMessage);
@@ -118,31 +108,37 @@ public class MQPublish extends AbstractConnector {
             connectionBuilder.closeConnection();
 
         } catch (Exception e) {
-            log.error("Problem in publishing to queue" + e);
+            log.error("Problem in publishing to message" + e);
             throw new ConnectException(e);
         }
     }
 
     /**
-     * Iniitialize queue
+     * Initialize queue
      */
-    MQQueue setQueue(MQConnectionBuilder connectionBuilder, MQConfiguration config, int qFlag) {
+    MQQueue setQueue(MQConnectionBuilder connectionBuilder, MQConfiguration config) {
         MQQueueManager manager = connectionBuilder.getQueueManager();
         MQQueue queue;
         try {
-            if (qFlag == 0) {
-                queue = manager.accessQueue(config.getQueue(), CMQC.MQOO_OUTPUT);
-            } else {
-                queue = manager.accessQueue(config.getreplyQueue(), CMQC.MQRC_READ_AHEAD_MSGS);
-            }
+            queue = manager.accessQueue(config.getQueue(), CMQC.MQOO_OUTPUT);
         } catch (MQException e) {
-            if (qFlag == 0) {
-                log.error("Error creating queue " + e);
-            } else {
-                log.error("Error creating reply queue" + e);
-            }
+            log.error("Error creating queue " + e);
             return null;
+        }
+        return queue;
+    }
 
+    /**
+     * Initialize reply queue
+     */
+    MQQueue setReplyQueue(MQConnectionBuilder connectionBuilder, MQConfiguration config) {
+        MQQueueManager manager = connectionBuilder.getQueueManager();
+        MQQueue queue;
+        try {
+            queue = manager.accessQueue(config.getreplyQueue(), CMQC.MQRC_READ_AHEAD_MSGS);
+        } catch (MQException e) {
+            log.error("Error creating reply queue" + e);
+            return null;
         }
         return queue;
     }
@@ -164,13 +160,11 @@ public class MQPublish extends AbstractConnector {
     }
 
     /**
-     * Create mq message
+     * Create report MQMesaage
      */
-    MQMessage buildMessage(MQConfiguration config, String queueMessage, MessageContext msgCtx) {
+    MQMessage buildReportMessage(MQConfiguration config, String queueMessage, MessageContext msgCtx) {
 
         MQMessage mqMessage = new MQMessage();
-        mqMessage.encoding = MQENC_NATIVE;
-        mqMessage.format = MQFMT_STRING;
         mqMessage.messageId = config.getMessageID().getBytes();
         mqMessage.correlationId = config.getCorrelationID().getBytes();
         if (config.getPriority() != -1000) {
@@ -178,24 +172,52 @@ public class MQPublish extends AbstractConnector {
         }
         int messageType = config.getMessageType();
         mqMessage.messageType = messageType;
-        switch (messageType) {
-            case 2://reply message
-                break;
-            case 4://report message
-                String reportQueue = config.getreplyQueue();
-                if (reportQueue != null) {
-                    mqMessage.replyToQueueName = reportQueue;
-                    mqMessage.report = CMQC.MQRO_COA_WITH_FULL_DATA | CMQC.MQRO_EXCEPTION_WITH_FULL_DATA | CMQC.MQRO_COD_WITH_FULL_DATA | CMQC.MQRO_EXPIRATION_WITH_FULL_DATA;
-                    MQQueue reply;
-                    reply = setQueue(this.connectionBuilder, this.config,1);
-                    if (reply != null) {
-                        getReplyMessage(reply, this.config, msgCtx);
-                    }
-                } else {
-                    log.info("Reply queue not specified");
-                }
-                break;
+        String reportQueue = config.getreplyQueue();
+        if (reportQueue != null) {
+            mqMessage.replyToQueueName = reportQueue;
+            mqMessage.report = CMQC.MQRO_COA_WITH_FULL_DATA | CMQC.MQRO_EXCEPTION_WITH_FULL_DATA | CMQC.MQRO_COD_WITH_FULL_DATA | CMQC.MQRO_EXPIRATION_WITH_FULL_DATA;
+            MQQueue reply;
+            reply = setReplyQueue(this.connectionBuilder, this.config);
+            if (reply != null) {
+                getReportMessage(reply, this.config, msgCtx);
+            }
+        } else {
+            log.info("Reply queue not specified");
         }
+
+        if (config.isPersistent()) {
+            mqMessage.persistence = MQPER_PERSISTENT;
+        } else {
+            mqMessage.persistence = MQPER_NOT_PERSISTENT;
+        }
+        if (config.getgroupID() != null) {
+            mqMessage.groupId = config.getgroupID().getBytes();
+        }
+
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(new Date(System.currentTimeMillis()));
+        mqMessage.putDateTime = cal;
+        try {
+            mqMessage.writeString(queueMessage);
+        } catch (Exception e) {
+            log.info("Error creating mq message" + e);
+        }
+        return mqMessage;
+    }
+
+    /**
+     * Create datagram or request MQMessage
+     */
+    MQMessage buildDatagramOrRequestMessage(MQConfiguration config, String queueMessage, MessageContext msgCtx) {
+
+        MQMessage mqMessage = new MQMessage();
+        mqMessage.messageId = config.getMessageID().getBytes();
+        mqMessage.correlationId = config.getCorrelationID().getBytes();
+        if (config.getPriority() != -1000) {
+            mqMessage.priority = config.getPriority();
+        }
+        int messageType = config.getMessageType();
+        mqMessage.messageType = messageType;
 
         if (config.isPersistent()) {
             mqMessage.persistence = MQPER_PERSISTENT;
@@ -211,8 +233,6 @@ public class MQPublish extends AbstractConnector {
         mqMessage.putDateTime = cal;
 
         try {
-            mqMessage.setStringProperty("ContentType", config.getContentType());
-            mqMessage.setStringProperty("CHARACTER_SET_ENCODING", config.getCharsetEncoding());
             mqMessage.writeString(queueMessage);
         } catch (Exception e) {
             log.info("Error creating mq message" + e);
@@ -221,9 +241,9 @@ public class MQPublish extends AbstractConnector {
     }
 
     /**
-     * Get reply message
+     * Get report message
      */
-    void getReplyMessage(final MQQueue replyQueue, MQConfiguration config, final MessageContext msgCtx) {
+    void getReportMessage(final MQQueue replyQueue, MQConfiguration config, final MessageContext msgCtx) {
 
         final MQMessage message = new MQMessage();
         final MQGetMessageOptions gmo = new MQGetMessageOptions();
@@ -243,8 +263,7 @@ public class MQPublish extends AbstractConnector {
                         md.copyFrom(message);
                         msgCtx.setProperty("Format", md.getFormat());
                         msgCtx.setProperty("Feedback", md.getFeedback());
-                        buildreplyMessage(reportStr(md.getFeedback()), "text/plain", msgCtx);
-                        log.info("Report-" + reportStr(md.getFeedback()));
+                        msgCtx.setProperty("Report",reportStr(md.getFeedback()));
                         break;
                     } catch (MQException e) {
                         log.info("Waiting for reply message");
@@ -253,31 +272,6 @@ public class MQPublish extends AbstractConnector {
             }
         });
         executorService.shutdown();
-    }
-
-    /**
-     * Create reply message if message type is report
-     */
-    void buildreplyMessage(String strMessage, String contentType, MessageContext msgCtx) {
-        AutoCloseInputStream in = new AutoCloseInputStream(new ByteArrayInputStream(strMessage.getBytes()));
-        try {
-            org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) msgCtx).getAxis2MessageContext();
-            Builder builder;
-            if (StringUtils.isEmpty(contentType)) {
-                contentType = org.wso2.carbon.esb.connector.MQConstants.DEFAULT_CONTENT_TYPE;
-            }
-            int index = contentType.indexOf(';');
-            String type = index > 0 ? contentType.substring(0, index) : contentType;
-            builder = BuilderUtil.getBuilderFromSelector(type, axis2MsgCtx);
-            if (builder == null) {
-                builder = new SOAPBuilder();
-            }
-            OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
-            msgCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
-
-        } catch (AxisFault axisFault) {
-            axisFault.printStackTrace();
-        }
     }
 
     /**
