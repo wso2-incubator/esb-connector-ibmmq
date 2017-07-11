@@ -33,8 +33,6 @@
                 <qmanager>qmanager</qmanager>
                 <channel>PASSWORD.SVRCONN</channel>
                 <queue>myqueue</queue>
-                <topicname>mytopic</topicname>
-                <topicstring>topic</topicstring>
                 <transportType>1</transportType>
                 <messageType>MQMT_DATAGRAM(or MQMT_REPLY)</messageType>
                 <persistent>true</persistent>
@@ -47,7 +45,7 @@
                 <groupID>GroupID@IBMMQ123</groupID>
                 <sslEnable>false</sslEnable>
             </ibmmq.init>
-            <ibmmq.sendmessage/>
+            <ibmmq.queue/>
         </inSequence>
     </target>
     <description/>
@@ -74,8 +72,6 @@
                 <qmanager>qmanager</qmanager>
                 <channel>PASSWORD.SVRCONN</channel>
                 <queue>myqueue</queue>
-                <topicname>mytopic</topicname>
-                <topicstring>topic</topicstring>
                 <transportType>1</transportType>
                 <messageType>MQMT_DATAGRAM(or MQMT_REPLY)</messageType>
                 <persistent>true</persistent>
@@ -94,12 +90,13 @@
                 <keyStore>wso2carbon.jks</keyStore>
                 <keyPassword>wso2carbon</keyPassword>
             </ibmmq.init>
-            <ibmmq.sendmessage/>
+            <ibmmq.queue/>
         </inSequence>
     </target>
     <description/>
 </proxy>
 ```
+
 #### Sample proxy service for request or a report message
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -119,8 +116,6 @@
                 <qmanager>qmanager</qmanager>
                 <channel>PASSWORD.SVRCONN</channel>
                 <queue>myqueue</queue>
-                <topicname>mytopic</topicname>
-                <topicstring>topic</topicstring>
                 <transportType>1</transportType>
                 <messageType>MQMT_REQUEST</messageType>
                 <persistent>true</persistent>
@@ -141,7 +136,52 @@
                 <keyStore>wso2carbon.jks</keyStore>
                 <keyPassword>wso2carbon</keyPassword>
             </ibmmq.init>
-            <ibmmq.sendmessage/>
+            <ibmmq.queue/>
+        </inSequence>
+    </target>
+    <description/>
+</proxy>
+
+```
+#### Sample proxy service for publish to topic
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<proxy xmlns="http://ws.apache.org/ns/synapse"
+       name="ibmmqtest"
+       startOnLoad="true"
+       statistics="disable"
+       trace="disable"
+       transports="http,https">
+    <target>
+        <inSequence>
+            <ibmmq.init>
+                <username>mqm</username>
+                <password>upgs5423</password>
+                <port>1414</port>
+                <host>127.0.0.1</host>
+                <qmanager>qmanager</qmanager>
+                <channel>PASSWORD.SVRCONN</channel>
+                <topicname>mytopic</topicname>
+                <topicstring>topic</topicstring>
+                <transportType>1</transportType>
+                <messageType>MQMT_REQUEST</messageType>
+                <persistent>true</persistent>
+                <priority>3</priority>>
+                <maxconnections>75</maxconnections>
+                <maxunusedconnections>50</maxunusedconnections>
+                <timeout>3600000</timeout>
+                <messageID>MessageID@IBMMQ123</messageID>
+                <correlationID>CorrelationID@IBMMQ123</correlationID>
+                <groupID>GroupID@IBMMQ123</groupID>
+                <sslEnable>false</sslEnable>
+                <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
+                <flipsRequired>false</flipsRequired>
+                <trustStore>wso2carbon.jks</trustStore>
+                <trustPassword>wso2carbon</trustPassword>
+                <keyStore>wso2carbon.jks</keyStore>
+                <keyPassword>wso2carbon</keyPassword>
+            </ibmmq.init>
+            <ibmmq.topic/>
         </inSequence>
     </target>
     <description/>
