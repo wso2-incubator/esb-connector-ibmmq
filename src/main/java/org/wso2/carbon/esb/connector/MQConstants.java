@@ -49,4 +49,5 @@ public class MQConstants {
     public static final String PRIORITY = "uri.var.priority";
     public static final String MESSAGE_TYPE = "uri.var.messageType";
     public static final String REPLY_MESSAGE_QUEUE = "uri.var.replyQueue";
+    public static final String REPLY_TIMEOUT = "uri.var.replyTimeout";
 }

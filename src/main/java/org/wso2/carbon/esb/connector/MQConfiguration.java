@@ -54,6 +54,7 @@ public class MQConfiguration {
     private int messageType = MQMT_REQUEST;
     private String replyQueue;
     private int priority;
+    private int replyTimeout;
 
     MQConfiguration(MessageContext msg) {
 
@@ -77,6 +78,8 @@ public class MQConfiguration {
                 this.messageType = MQMT_DATAGRAM;
             } else if (messageTypeString.equals("MQMT_REPORT")) {
                 this.messageType = MQMT_REPORT;
+            } else if (messageTypeString.equals("MQMT_REPLY")) {
+                this.messageType = MQMT_REPLY;
             }
         }
 
@@ -104,9 +107,15 @@ public class MQConfiguration {
         }
 
         if (msg.getProperty(MQConstants.TIMEOUT) != null) {
-            this.timeout = Long.valueOf((String) msg.getProperty(MQConstants.CIPHERSUIT));
+            this.timeout = Long.valueOf((String) msg.getProperty(MQConstants.TIMEOUT));
         } else {
             this.timeout = 3600000;
+        }
+
+        if (msg.getProperty(MQConstants.REPLY_TIMEOUT) != null) {
+            this.replyTimeout = Integer.valueOf((String) msg.getProperty(MQConstants.REPLY_TIMEOUT));
+        } else {
+            this.replyTimeout = 1;
         }
 
         if (msg.getProperty(MQConstants.MAX_CONNECTIONS) != null) {
@@ -240,6 +249,10 @@ public class MQConfiguration {
 
     public long getTimeout() {
         return timeout;
+    }
+
+    public int getReplyTimeout() {
+        return replyTimeout;
     }
 
     public String getCiphersuit() {

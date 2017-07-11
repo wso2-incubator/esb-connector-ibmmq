@@ -23,19 +23,10 @@ import com.ibm.mq.constants.MQConstants;
 import com.ibm.mq.headers.MQMD;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.builder.Builder;
-import org.apache.axis2.builder.BuilderUtil;
-import org.apache.axis2.builder.SOAPBuilder;
-import org.apache.axis2.transport.TransportUtils;
-import org.apache.commons.io.input.AutoCloseInputStream;
-import org.apache.commons.lang.StringUtils;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -82,11 +73,14 @@ public class MQPublish extends AbstractConnector {
                 topic = setTopic(connectionBuilder, config);
             }
             switch(messageType){
+                case 1:
+                    mqMessage=buildRequestMessageandGetResponse(config, queueMessage);
+                    break;
                 case 4:
-                    mqMessage= buildReportMessage(config, queueMessage, messageContext);
+                    mqMessage= buildReportMessage(config, queueMessage);
                     break;
                 default:
-                    mqMessage = buildDatagramOrRequestMessage(config, queueMessage, messageContext);
+                    mqMessage = buildDatagramOrReplyMessage(config, queueMessage);
             }
 
             if (queue == null || mqMessage==null) {
@@ -160,9 +154,53 @@ public class MQPublish extends AbstractConnector {
     }
 
     /**
+     * Create request MQMesaage
+     */
+    MQMessage buildRequestMessageandGetResponse(MQConfiguration config, String queueMessage) {
+
+        MQMessage mqMessage = new MQMessage();
+        mqMessage.messageId = config.getMessageID().getBytes();
+        mqMessage.correlationId = config.getCorrelationID().getBytes();
+        if (config.getPriority() != -1000) {
+            mqMessage.priority = config.getPriority();
+        }
+        int messageType = config.getMessageType();
+        mqMessage.messageType = messageType;
+        String reportQueue = config.getreplyQueue();
+        if (reportQueue != null) {
+            MQQueue reply;
+            reply = setReplyQueue(this.connectionBuilder, this.config);
+            if (reply != null) {
+                getReplyMessge(reply, this.config);
+            }
+        } else {
+            log.info("Reply queue not specified");
+        }
+        if (config.isPersistent()) {
+            mqMessage.persistence = MQPER_PERSISTENT;
+        } else {
+            mqMessage.persistence = MQPER_NOT_PERSISTENT;
+        }
+        if (config.getgroupID() != null) {
+            mqMessage.groupId = config.getgroupID().getBytes();
+        }
+
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(new Date(System.currentTimeMillis()));
+        mqMessage.putDateTime = cal;
+        try {
+            mqMessage.writeString(queueMessage);
+        } catch (Exception e) {
+            log.info("Error creating mq message" + e);
+        }
+        return mqMessage;
+    }
+
+
+    /**
      * Create report MQMesaage
      */
-    MQMessage buildReportMessage(MQConfiguration config, String queueMessage, MessageContext msgCtx) {
+    MQMessage buildReportMessage(MQConfiguration config, String queueMessage) {
 
         MQMessage mqMessage = new MQMessage();
         mqMessage.messageId = config.getMessageID().getBytes();
@@ -179,7 +217,7 @@ public class MQPublish extends AbstractConnector {
             MQQueue reply;
             reply = setReplyQueue(this.connectionBuilder, this.config);
             if (reply != null) {
-                getReportMessage(reply, this.config, msgCtx);
+                getReportMessage(reply, this.config);
             }
         } else {
             log.info("Reply queue not specified");
@@ -208,7 +246,7 @@ public class MQPublish extends AbstractConnector {
     /**
      * Create datagram or request MQMessage
      */
-    MQMessage buildDatagramOrRequestMessage(MQConfiguration config, String queueMessage, MessageContext msgCtx) {
+    MQMessage buildDatagramOrReplyMessage(MQConfiguration config, String queueMessage) {
 
         MQMessage mqMessage = new MQMessage();
         mqMessage.messageId = config.getMessageID().getBytes();
@@ -243,7 +281,7 @@ public class MQPublish extends AbstractConnector {
     /**
      * Get report message
      */
-    void getReportMessage(final MQQueue replyQueue, MQConfiguration config, final MessageContext msgCtx) {
+    void getReportMessage(final MQQueue replyQueue, MQConfiguration config) {
 
         final MQMessage message = new MQMessage();
         final MQGetMessageOptions gmo = new MQGetMessageOptions();
@@ -261,9 +299,7 @@ public class MQPublish extends AbstractConnector {
                         replyQueue.get(message, gmo);
                         MQMD md = new MQMD();
                         md.copyFrom(message);
-                        msgCtx.setProperty("Format", md.getFormat());
-                        msgCtx.setProperty("Feedback", md.getFeedback());
-                        msgCtx.setProperty("Report",reportStr(md.getFeedback()));
+                        log.info("Report"+reportStr(md.getFeedback()));
                         break;
                     } catch (MQException e) {
                         log.info("Waiting for reply message");
@@ -273,6 +309,42 @@ public class MQPublish extends AbstractConnector {
         });
         executorService.shutdown();
     }
+
+    /**
+     * Get reply message
+     */
+    void getReplyMessge(final MQQueue replyQueue, MQConfiguration config) {
+
+        final MQMessage message = new MQMessage();
+        final MQGetMessageOptions gmo = new MQGetMessageOptions();
+        message.messageId = config.getMessageID().getBytes();
+        message.correlationId = config.getCorrelationID().getBytes();
+        gmo.matchOptions = MQConstants.MQMO_MATCH_CORREL_ID;
+        gmo.matchOptions = MQConstants.MQMO_MATCH_GROUP_ID;
+
+        Timer replyMessage=new Timer();
+
+        replyMessage.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    replyQueue.get(message, gmo);
+                    log.info("Reply received");
+                    MQMD md = new MQMD();
+                    md.copyFrom(message);
+                    message.getDataLength();
+                    int strLen = message.getDataLength();
+                    byte[] strData = new byte[strLen];
+                    message.readFully(strData);
+                    log.info("Reply-"+new String(strData));
+                } catch (MQException e) {
+
+                } catch (IOException e) {
+                }
+            }
+        },0,config.getReplyTimeout()*1000);
+    }
+
 
     /**
      * generate report details
