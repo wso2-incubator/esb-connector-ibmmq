@@ -46,12 +46,6 @@
                 <correlationID>CorrelationID@IBMMQ123</correlationID>
                 <groupID>GroupID@IBMMQ123</groupID>
                 <sslEnable>false</sslEnable>
-                <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
-                <flipsRequired>false</flipsRequired>
-                <trustStore>wso2carbon.jks</trustStore>
-                <trustPassword>wso2carbon</trustPassword>
-                <keyStore>wso2carbon.jks</keyStore>
-                <keyPassword>wso2carbon</keyPassword>
             </ibmmq.init>
             <ibmmq.sendmessage/>
         </inSequence>
