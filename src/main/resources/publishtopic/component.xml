@@ -14,10 +14,13 @@
    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
    KIND, either express or implied. See the License for the
    specific language governing permissions and limitations
-   under the License.-->
-
-<template name="sendmessage" onError="fault" xmlns="http://ws.apache.org/ns/synapse">
-    <sequence>
-        <class name="org.wso2.carbon.esb.connector.MQPublish"/>
-    </sequence>
-</template>
+   under the License.
+-->
+<component name="publishtopic" type="synapse/template">
+    <subComponents>
+        <component name="topic">
+            <file>topic.xml</file>
+            <description>send message to IBM MQ</description>
+        </component>
+    </subComponents>
+</component>

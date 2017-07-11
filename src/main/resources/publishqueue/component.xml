@@ -16,10 +16,10 @@
    specific language governing permissions and limitations
    under the License.
 -->
-<component name="producer" type="synapse/template">
+<component name="publishqueue" type="synapse/template">
     <subComponents>
-        <component name="sendmessage">
-            <file>sendmessage.xml</file>
+        <component name="queue">
+            <file>queue.xml</file>
             <description>send message to IBM MQ</description>
         </component>
     </subComponents>

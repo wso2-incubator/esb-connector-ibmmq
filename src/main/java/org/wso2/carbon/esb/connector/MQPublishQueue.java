@@ -40,12 +40,11 @@ import static com.ibm.mq.constants.CMQC.*;
 /**
  * Add messages to queue
  */
-public class MQPublish extends AbstractConnector {
+public class MQPublishQueue extends AbstractConnector {
 
     MQConnectionBuilder connectionBuilder;
     MQConfiguration config;
     MQQueue queue = null;
-    MQTopic topic = null;
 
     @Override
     public void connect(MessageContext messageContext) throws ConnectException {
@@ -69,9 +68,7 @@ public class MQPublish extends AbstractConnector {
             if(config.getQueue()!=null) {
                 queue = setQueue(connectionBuilder, config);
             }
-            if(config.getTopicName()!=null) {
-                topic = setTopic(connectionBuilder, config);
-            }
+
             switch(messageType){
                 case 1:
                     mqMessage=buildRequestMessageandGetResponse(config, queueMessage);
@@ -91,13 +88,6 @@ public class MQPublish extends AbstractConnector {
                 log.info("Message successfully placed at " + config.getQueue() + "queue");
             }
 
-            if (topic == null || mqMessage==null) {
-                log.error("Error in publishing message");
-            } else {
-                log.info("topic initialized");
-                topic.put(mqMessage);
-                log.info("Message successfully placed at " + config.getTopicName() + "topic");
-            }
 
             connectionBuilder.closeConnection();
 
@@ -135,22 +125,6 @@ public class MQPublish extends AbstractConnector {
             return null;
         }
         return queue;
-    }
-
-    /**
-     * Initialize queue
-     */
-    MQTopic setTopic(MQConnectionBuilder connectionBuilder, MQConfiguration config) {
-        MQQueueManager manager = connectionBuilder.getQueueManager();
-        MQTopic publisher;
-        try {
-            publisher = manager.accessTopic(config.getTopicString(), config.getTopicName(),
-                    CMQC.MQTOPIC_OPEN_AS_PUBLICATION, CMQC.MQOO_OUTPUT);
-        } catch (MQException e) {
-            log.error("Error creating topic" + e);
-            return null;
-        }
-        return publisher;
     }
 
     /**

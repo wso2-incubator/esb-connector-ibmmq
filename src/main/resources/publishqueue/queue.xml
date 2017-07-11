@@ -14,14 +14,10 @@
    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
    KIND, either express or implied. See the License for the
    specific language governing permissions and limitations
-   under the License.
--->
-<connector>
-    <component name="ibmmq" package="org.wso2.carbon.connector">
-        <dependency component="ibmmqconfig" description="mq configuration"/>
-        <dependency component="publishqueue" description="publish queue class"/>
-        <dependency component="publishtopic" description="publish topic class"/>
-        <description>wso2 IBM-MQ connector</description>
-    </component>
-    <icon>icon/icon.png</icon>
-</connector>
+   under the License.-->
+
+<template name="queue" onError="fault" xmlns="http://ws.apache.org/ns/synapse">
+    <sequence>
+        <class name="org.wso2.carbon.esb.connector.MQPublishQueue"/>
+    </sequence>
+</template>
