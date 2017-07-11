@@ -86,7 +86,7 @@ public class MQConfiguration {
         if (msg.getProperty(MQConstants.REPLY_MESSAGE_QUEUE) != null) {
             this.replyQueue = (String) msg.getProperty(MQConstants.REPLY_MESSAGE_QUEUE);
         } else {
-            this.replyQueue = "result";
+            this.replyQueue = null;
         }
 
         if (msg.getProperty(MQConstants.TOPIC_STRING) != null) {
