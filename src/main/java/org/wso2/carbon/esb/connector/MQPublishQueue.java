@@ -122,15 +122,10 @@ public class MQPublishQueue extends AbstractConnector {
         if (config.getPriority() != -1000) {
             mqMessage.priority = config.getPriority();
         }
+
         int messageType = config.getMessageType();
         mqMessage.messageType = messageType;
-        String reportQueue = config.getreplyQueue();
-        if (reportQueue != null) {
-            mqMessage.replyToQueueName = reportQueue;
-            if (messageType == MQMT_REPORT) {
-                mqMessage.report = CMQC.MQRO_COA_WITH_FULL_DATA | CMQC.MQRO_EXCEPTION_WITH_FULL_DATA | CMQC.MQRO_COD_WITH_FULL_DATA | CMQC.MQRO_EXPIRATION_WITH_FULL_DATA;
-            }
-        }
+
         if (config.isPersistent()) {
             mqMessage.persistence = MQPER_PERSISTENT;
         } else {
