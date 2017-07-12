@@ -30,10 +30,10 @@ import org.wso2.carbon.connector.core.ConnectException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.ibm.mq.constants.CMQC.*;
 
@@ -119,6 +119,8 @@ public class MQPublishQueue extends AbstractConnector {
         MQMessage mqMessage = new MQMessage();
         mqMessage.messageId = config.getMessageID().getBytes();
         mqMessage.correlationId = config.getCorrelationID().getBytes();
+        log.info("Correlation ID " + config.getCorrelationID());
+        log.info("Message ID " + config.getMessageID());
         if (config.getPriority() != -1000) {
             mqMessage.priority = config.getPriority();
         }
@@ -153,14 +155,21 @@ public class MQPublishQueue extends AbstractConnector {
     MQMessage buildRequestMessageandGetResponse(MQConfiguration config, String queueMessage) {
 
         MQMessage mqMessage = new MQMessage();
+
         mqMessage.messageId = config.getMessageID().getBytes();
+        log.info("message ID "+config.getMessageID());
         mqMessage.correlationId = config.getCorrelationID().getBytes();
+        log.info("correlation ID "+config.getCorrelationID());
+
         if (config.getPriority() != -1000) {
             mqMessage.priority = config.getPriority();
         }
+
         int messageType = config.getMessageType();
         mqMessage.messageType = messageType;
         String reportQueue = config.getreplyQueue();
+        mqMessage.replyToQueueName = reportQueue;
+
         if (reportQueue != null) {
             MQQueue reply;
             reply = setReplyQueue(this.connectionBuilder, this.config);
@@ -188,6 +197,47 @@ public class MQPublishQueue extends AbstractConnector {
             log.info("Error creating mq message" + e);
         }
         return mqMessage;
+    }
+
+    /**
+     * Get reply message
+     */
+    void getReplyMessge(final MQQueue replyQueue, MQConfiguration config) {
+
+        final AtomicBoolean received=new AtomicBoolean(false);
+        final MQMessage message = new MQMessage();
+        final MQGetMessageOptions gmo = new MQGetMessageOptions();
+
+        message.messageId = config.getMessageID().getBytes();
+        message.correlationId = config.getCorrelationID().getBytes();
+
+        gmo.matchOptions = MQConstants.MQMO_MATCH_CORREL_ID+MQConstants.MQMO_MATCH_GROUP_ID;
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(new Runnable() {
+            public void run() {
+                try {
+                        replyQueue.get(message, gmo);
+                        log.info("Reply received");
+                        MQMD md = new MQMD();
+                        md.copyFrom(message);
+                        message.getDataLength();
+                        log.info("Correlation ID " + new String(message.correlationId));
+                        log.info("Message ID " + new String(message.messageId));
+                        int strLen = message.getDataLength();
+                        byte[] strData = new byte[strLen];
+                        message.readFully(strData);
+                        log.info("Reply-\n" + new String(strData));
+                        received.set(true);
+                    } catch (MQException e) {
+                        log.info("Waiting for a reply");
+                    } catch (IOException e) {
+                    }
+            }
+        }, 0, config.getReplyTimeout(), TimeUnit.SECONDS);
+        if(received.get()){
+            scheduler.shutdown();
+        }
     }
 
     /**
@@ -242,66 +292,33 @@ public class MQPublishQueue extends AbstractConnector {
      */
     void getReportMessage(final MQQueue replyQueue, MQConfiguration config) {
 
+        final AtomicBoolean received=new AtomicBoolean(false);
         final MQMessage message = new MQMessage();
         final MQGetMessageOptions gmo = new MQGetMessageOptions();
+
         message.messageId = config.getMessageID().getBytes();
         message.correlationId = config.getCorrelationID().getBytes();
-        gmo.matchOptions = MQConstants.MQMO_MATCH_CORREL_ID;
-        gmo.matchOptions = MQConstants.MQMO_MATCH_GROUP_ID;
 
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        gmo.matchOptions = MQConstants.MQMO_MATCH_CORREL_ID+MQConstants.MQMO_MATCH_GROUP_ID;
 
-        executorService.execute(new Runnable() {
-            public void run() {
-                while (true) {
-                    try {
-                        replyQueue.get(message, gmo);
-                        MQMD md = new MQMD();
-                        md.copyFrom(message);
-                        log.info("Report" + reportStr(md.getFeedback()));
-                        break;
-                    } catch (MQException e) {
-                        log.info("Waiting for reply message");
-                    }
-                }
-            }
-        });
-        executorService.shutdown();
-    }
-
-    /**
-     * Get reply message
-     */
-    void getReplyMessge(final MQQueue replyQueue, MQConfiguration config) {
-
-        final MQMessage message = new MQMessage();
-        final MQGetMessageOptions gmo = new MQGetMessageOptions();
-        message.messageId = config.getMessageID().getBytes();
-        message.correlationId = config.getCorrelationID().getBytes();
-        gmo.matchOptions = MQConstants.MQMO_MATCH_CORREL_ID;
-        gmo.matchOptions = MQConstants.MQMO_MATCH_GROUP_ID;
-
-        Timer replyMessage = new Timer();
-
-        replyMessage.schedule(new TimerTask() {
-            @Override
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(new Runnable() {
             public void run() {
                 try {
                     replyQueue.get(message, gmo);
-                    log.info("Reply received");
                     MQMD md = new MQMD();
                     md.copyFrom(message);
-                    message.getDataLength();
-                    int strLen = message.getDataLength();
-                    byte[] strData = new byte[strLen];
-                    message.readFully(strData);
-                    log.info("Reply-" + new String(strData));
+                    log.info("Report" + reportStr(md.getFeedback()));
+                    received.set(true);
                 } catch (MQException e) {
-
-                } catch (IOException e) {
+                    log.info("Waiting for reply message");
                 }
             }
-        }, 0, config.getReplyTimeout() * 1000);
+        },0, config.getReplyTimeout(), TimeUnit.SECONDS);
+
+        if(received.get()) {
+            scheduler.shutdown();
+        }
     }
 
     /**
