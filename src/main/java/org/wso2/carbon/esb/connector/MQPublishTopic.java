@@ -17,7 +17,10 @@
 */
 package org.wso2.carbon.esb.connector;
 
-import com.ibm.mq.*;
+import com.ibm.mq.MQException;
+import com.ibm.mq.MQMessage;
+import com.ibm.mq.MQQueueManager;
+import com.ibm.mq.MQTopic;
 import com.ibm.mq.constants.CMQC;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -28,7 +31,8 @@ import org.wso2.carbon.connector.core.ConnectException;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import static com.ibm.mq.constants.CMQC.*;
+import static com.ibm.mq.constants.CMQC.MQPER_NOT_PERSISTENT;
+import static com.ibm.mq.constants.CMQC.MQPER_PERSISTENT;
 
 /**
  * Add messages to queue
@@ -55,13 +59,13 @@ public class MQPublishTopic extends AbstractConnector {
                 queueMessage = getElement.toString();
             }
 
-            MQMessage mqMessage= buildMQMessage(config,queueMessage);
+            MQMessage mqMessage = buildMQMessage(config, queueMessage);
 
-            if(config.getTopicName()!=null) {
+            if (config.getTopicName() != null) {
                 topic = setTopic(connectionBuilder, config);
             }
 
-            if (topic == null || mqMessage==null) {
+            if (topic == null || mqMessage == null) {
                 log.error("Error in publishing message");
             } else {
                 log.info("topic initialized");
