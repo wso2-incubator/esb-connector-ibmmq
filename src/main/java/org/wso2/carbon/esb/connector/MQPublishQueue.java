@@ -67,9 +67,8 @@ public class MQPublishQueue extends AbstractConnector {
             String accessMode = config.getAccessMode();
 
             if (accessMode.equals("Exclusive")) {
-                synchronized (this) {
+
                     MQQueue queue = setQueue(connectionBuilder, config);
-                    ;
                     int messageType = config.getMessageType();
                     MQMessage mqMessage;
 
@@ -92,7 +91,7 @@ public class MQPublishQueue extends AbstractConnector {
                         log.info("Message successfully placed at " + config.getQueue() + " queue and closed");
                     }
                     connectionBuilder.closeConnection();
-                }
+
             } else if (accessMode.equals("Shared")) {
 
                 final String messagetoDeliver = queueMessage;
