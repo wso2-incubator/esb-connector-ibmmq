@@ -80,6 +80,7 @@
                 <maxunusedconnections>50</maxunusedconnections>
                 <timeout>3600000</timeout>
                 <messageID>MessageID@IBMMQ123</messageID>
+                <accessMode>Exclusive</accessMode>
                 <correlationID>CorrelationID@IBMMQ123</correlationID>
                 <groupID>GroupID@IBMMQ123</groupID>
                 <sslEnable>true</sslEnable>
@@ -124,6 +125,7 @@
                 <maxunusedconnections>50</maxunusedconnections>
                 <timeout>3600000</timeout>
                 <replyTimeout>5</replyTimeout>
+                <accessMode>Exclusive</accessMode>
                 <messageID>MessageID@IBMMQ123</messageID>
                 <correlationID>CorrelationID@IBMMQ123</correlationID>
                 <groupID>GroupID@IBMMQ123</groupID>
@@ -170,6 +172,7 @@
                 <maxconnections>75</maxconnections>
                 <maxunusedconnections>50</maxunusedconnections>
                 <timeout>3600000</timeout>
+                <accessMode>Exclusive</accessMode>
                 <messageID>MessageID@IBMMQ123</messageID>
                 <correlationID>CorrelationID@IBMMQ123</correlationID>
                 <groupID>GroupID@IBMMQ123</groupID>

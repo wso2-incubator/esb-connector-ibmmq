@@ -45,6 +45,7 @@
     <parameter name="priority" description="Priority of the message"/>
     <parameter name="persistent" description="Message is persistent or not"/>
     <parameter name="replyTimeout" description="Timeout for reply message"/>
+    <parameter name="accessMode" description="Type of access"/>
     <sequence>
         <property expression="$func:username" name="uri.var.username" scope="default" type="STRING"/>
         <property expression="$func:password" name="uri.var.password" scope="default" type="STRING"/>
@@ -75,5 +76,6 @@
         <property expression="$func:priority" name="uri.var.priority" scope="default" type="STRING"/>
         <property expression="$func:persistent" name="uri.var.persistent" scope="default" type="STRING"/>
         <property expression="$func:replyTimeout" name="uri.var.replyTimeout" scope="default" type="STRING"/>
+        <property expression="$func:accessMode" name="uri.var.accessMode" scope="default" type="STRING"/>
     </sequence>
 </template>

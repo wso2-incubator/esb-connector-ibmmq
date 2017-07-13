@@ -51,10 +51,11 @@ public class MQConfiguration {
     private String correlationID;
     private String groupID;
     private boolean persistent;
-    private int messageType = MQMT_REQUEST;
+    private int messageType = MQMT_DATAGRAM;
     private String replyQueue;
     private int priority;
     private int replyTimeout;
+    private String accessMode;
 
     MQConfiguration(MessageContext msg) {
 
@@ -87,6 +88,12 @@ public class MQConfiguration {
             this.replyQueue = (String) msg.getProperty(MQConstants.REPLY_MESSAGE_QUEUE);
         } else {
             this.replyQueue = null;
+        }
+
+        if (msg.getProperty(MQConstants.ACCESS_MODE) != null) {
+            this.accessMode = (String) msg.getProperty(MQConstants.ACCESS_MODE);
+        } else {
+            this.accessMode = "Exclusive";
         }
 
         if (msg.getProperty(MQConstants.TOPIC_STRING) != null) {
@@ -346,5 +353,10 @@ public class MQConfiguration {
     public int getPriority() {
         return priority;
     }
+
+    public String getAccessMode() {
+        return accessMode;
+    }
+
 
 }
