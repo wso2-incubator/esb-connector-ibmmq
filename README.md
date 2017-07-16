@@ -37,7 +37,7 @@
 19. correlationID/messageID/groupID - IDs for link messages
 20. accessMode - Exclusive/Shared whether the queue operations can initialize in parallel or sequential pattern
 21. replyQueue - The queue which the reply message or the report message should dispatch if the message type is MQMT_REQUEST or MQMT_REPORT
-22. replyTimeout - Timeout for listener of the replyQueue 
+22. replyTimeout - Timeout for the listener of the replyQueue 
 
 #### Sample proxy service without ssl
 ```
