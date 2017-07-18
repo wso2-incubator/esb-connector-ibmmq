@@ -253,7 +253,7 @@ public class MQPublishQueue extends AbstractConnector {
         message.messageId = config.getMessageID().getBytes();
         message.correlationId = config.getCorrelationID().getBytes();
 
-        gmo.matchOptions = MQConstants.MQMO_MATCH_CORREL_ID + MQConstants.MQMO_MATCH_GROUP_ID;
+        gmo.matchOptions = MQConstants.MQMO_MATCH_CORREL_ID + MQConstants.MQMO_MATCH_MSG_ID;
 
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(new Runnable() {
