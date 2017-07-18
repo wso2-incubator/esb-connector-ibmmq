@@ -46,6 +46,9 @@
     <parameter name="persistent" description="Message is persistent or not"/>
     <parameter name="replyTimeout" description="Timeout for reply message"/>
     <parameter name="accessMode" description="Type of access"/>
+    <parameter name="connectionNamelist" description="List of ports and hosts"/>
+    <parameter name="reconnectTimeout" description="Timeout for reconnection"/>
+    <parameter name="channelList" description="List of channels to reconnect"/>
     <sequence>
         <property expression="$func:username" name="uri.var.username" scope="default" type="STRING"/>
         <property expression="$func:password" name="uri.var.password" scope="default" type="STRING"/>
@@ -76,6 +79,9 @@
         <property expression="$func:priority" name="uri.var.priority" scope="default" type="STRING"/>
         <property expression="$func:persistent" name="uri.var.persistent" scope="default" type="STRING"/>
         <property expression="$func:replyTimeout" name="uri.var.replyTimeout" scope="default" type="STRING"/>
-        <property expression="$func:accessMode" name="uri.var.accessMode" scope="default" type="STRING"/>
+        <property expression="$func:connectionNamelist" name="uri.var.connectionNamelist" scope="default"
+                  type="STRING"/>
+        <property expression="$func:reconnectTimeout" name="uri.var.reconnectTimeout" scope="default" type="STRING"/>
+        <property expression="$func:channelList" name="uri.var.channelList" scope="default" type="STRING"/>
     </sequence>
 </template>

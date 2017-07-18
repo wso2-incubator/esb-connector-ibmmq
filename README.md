@@ -38,6 +38,9 @@
 20. accessMode - Exclusive/Shared whether the queue operations can initialize in parallel or sequential pattern
 21. replyQueue - The queue which the reply message or the report message should dispatch if the message type is MQMT_REQUEST or MQMT_REPORT
 22. replyTimeout - Timeout for the listener of the replyQueue 
+23. connectionNamelist - List of hosts and ports in case of connection failure
+24. channelList - List of channels in case of connection failure
+25. reconnectionTimeout - Reconnection timeout
 
 #### Sample proxy service without ssl
 ```
@@ -58,6 +61,9 @@
                 <qmanager>qmanager</qmanager>
                 <channel>PASSWORD.SVRCONN</channel>
                 <queue>myqueue</queue>
+                <connectionNamelist>12.0.0.1/1414,127.0.0.1/1414</connectionNamelist>
+                <channelList>PASSWORD.SVRCONN,PASSWORD.SVRCONN,PASSWORD.SVRCONN</channelList>
+                <reconnectTimeout>10000</reconnectTimeout>
                 <messageType>MQMT_DATAGRAM(or MQMT_REPLY)</messageType>
                 <persistent>true</persistent>
                 <priority>3</priority>>
@@ -96,6 +102,9 @@
                 <qmanager>qmanager</qmanager>
                 <channel>PASSWORD.SVRCONN</channel>
                 <queue>myqueue</queue>
+                <connectionNamelist>12.0.0.1/1414,127.0.0.1/1414</connectionNamelist>
+                <channelList>PASSWORD.SVRCONN,PASSWORD.SVRCONN,PASSWORD.SVRCONN</channelList>
+                <reconnectTimeout>10000</reconnectTimeout>
                 <messageType>MQMT_DATAGRAM(or MQMT_REPLY)</messageType>
                 <persistent>true</persistent>
                 <priority>3</priority>>
@@ -140,6 +149,9 @@
                 <qmanager>qmanager</qmanager>
                 <channel>PASSWORD.SVRCONN</channel>
                 <queue>myqueue</queue>
+                <connectionNamelist>12.0.0.1/1414,127.0.0.1/1414</connectionNamelist>
+                <channelList>PASSWORD.SVRCONN,PASSWORD.SVRCONN,PASSWORD.SVRCONN</channelList>
+                <reconnectTimeout>10000</reconnectTimeout>
                 <messageType>MQMT_REQUEST</messageType>
                 <persistent>true</persistent>
                 <priority>3</priority>>
@@ -185,6 +197,9 @@
                 <host>127.0.0.1</host>
                 <qmanager>qmanager</qmanager>
                 <channel>PASSWORD.SVRCONN</channel>
+                <connectionNamelist>12.0.0.1/1414,127.0.0.1/1414</connectionNamelist>
+                <channelList>PASSWORD.SVRCONN,PASSWORD.SVRCONN,PASSWORD.SVRCONN</channelList>
+                <reconnectTimeout>10000</reconnectTimeout>
                 <topicname>mytopic</topicname>
                 <topicstring>topic</topicstring>
                 <messageType>MQMT_REQUEST</messageType>

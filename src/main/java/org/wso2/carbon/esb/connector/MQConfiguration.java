@@ -20,6 +20,8 @@ package org.wso2.carbon.esb.connector;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 
+import java.util.Stack;
+
 import static com.ibm.mq.constants.CMQC.*;
 
 /**
@@ -56,6 +58,9 @@ public class MQConfiguration {
     private int priority;
     private int replyTimeout;
     private String accessMode;
+    private Stack reconnectList = new Stack();
+    private int reconnectTimeout;
+    private Stack channelList = new Stack();
 
     MQConfiguration(MessageContext msg) {
 
@@ -90,6 +95,15 @@ public class MQConfiguration {
             this.replyQueue = null;
         }
 
+        if (msg.getProperty(MQConstants.CONNECTION_NAMELIST) != null) {
+            String connectionNameList[] = ((String) msg.getProperty(MQConstants.CONNECTION_NAMELIST)).split(",");
+            for (String item : connectionNameList) {
+                reconnectList.push(item);
+            }
+        } else {
+            reconnectList = null;
+        }
+
         if (msg.getProperty(MQConstants.ACCESS_MODE) != null) {
             this.accessMode = (String) msg.getProperty(MQConstants.ACCESS_MODE);
         } else {
@@ -100,6 +114,15 @@ public class MQConfiguration {
             this.topicString = (String) msg.getProperty(MQConstants.TOPIC_STRING);
         } else {
             this.topicString = null;
+        }
+
+        if (msg.getProperty(MQConstants.CONNECTION_CHANNELLIST) != null) {
+            String channelArray[] = ((String) msg.getProperty(MQConstants.CONNECTION_CHANNELLIST)).split(",");
+            for (String item : channelArray) {
+                channelList.push(item);
+            }
+        } else {
+            channelList = null;
         }
 
         if (msg.getProperty(MQConstants.SSL_ENABLE) != null) {
@@ -123,6 +146,12 @@ public class MQConfiguration {
             this.replyTimeout = Integer.valueOf((String) msg.getProperty(MQConstants.REPLY_TIMEOUT));
         } else {
             this.replyTimeout = 1;
+        }
+
+        if (msg.getProperty(MQConstants.RECONNECT_TIMEOUT) != null) {
+            this.reconnectTimeout = Integer.valueOf((String) msg.getProperty(MQConstants.RECONNECT_TIMEOUT));
+        } else {
+            this.reconnectTimeout = 5;
         }
 
         if (msg.getProperty(MQConstants.MAX_CONNECTIONS) != null) {
@@ -358,5 +387,16 @@ public class MQConfiguration {
         return accessMode;
     }
 
+    public Stack getReconnectList() {
+        return reconnectList;
+    }
+
+    public int getReconnectTimeout() {
+        return reconnectTimeout;
+    }
+
+    public Stack getChannelList() {
+        return channelList;
+    }
 
 }

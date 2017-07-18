@@ -85,7 +85,7 @@ public class MQPublishTopic extends AbstractConnector {
      * Initialize topic
      */
     MQTopic setTopic(MQConnectionBuilder connectionBuilder, MQConfiguration config) {
-        MQQueueManager manager = connectionBuilder.getQueueManager();
+        MQQueueManager manager = connectionBuilder.getManager();
         MQTopic publisher;
         try {
             publisher = manager.accessTopic(config.getTopicString(), config.getTopicName(),

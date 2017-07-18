@@ -30,7 +30,10 @@ import org.wso2.carbon.connector.core.ConnectException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.concurrent.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.ibm.mq.constants.CMQC.*;
@@ -68,29 +71,29 @@ public class MQPublishQueue extends AbstractConnector {
 
             if (accessMode.equals("Exclusive")) {
 
-                    MQQueue queue = setQueue(connectionBuilder, config);
-                    int messageType = config.getMessageType();
-                    MQMessage mqMessage;
+                MQQueue queue = setQueue(connectionBuilder, config);
+                int messageType = config.getMessageType();
+                MQMessage mqMessage;
 
-                    switch (messageType) {
-                        case 1:
-                            mqMessage = buildRequestMessageandGetResponse(config, queueMessage);
-                            break;
-                        case 4:
-                            mqMessage = buildReportMessage(config, queueMessage);
-                            break;
-                        default:
-                            mqMessage = buildDatagramOrReplyMessage(config, queueMessage);
-                    }
-                    if (queue == null || mqMessage == null) {
-                        log.error("Error in publishing message");
-                    } else {
-                        log.info("queue initialized");
-                        queue.put(mqMessage);
-                        queue.close();
-                        log.info("Message successfully placed at " + config.getQueue() + " queue and closed");
-                    }
-                    connectionBuilder.closeConnection();
+                switch (messageType) {
+                    case 1:
+                        mqMessage = buildRequestMessageandGetResponse(config, queueMessage);
+                        break;
+                    case 4:
+                        mqMessage = buildReportMessage(config, queueMessage);
+                        break;
+                    default:
+                        mqMessage = buildDatagramOrReplyMessage(config, queueMessage);
+                }
+                if (queue == null || mqMessage == null) {
+                    log.error("Error in publishing message");
+                } else {
+                    log.info("queue initialized");
+                    queue.put(mqMessage);
+                    queue.close();
+                    log.info("Message successfully placed at " + config.getQueue() + " queue and closed");
+                }
+                connectionBuilder.closeConnection();
 
             } else if (accessMode.equals("Shared")) {
 
@@ -123,7 +126,7 @@ public class MQPublishQueue extends AbstractConnector {
                             try {
                                 queue.put(mqMessage);
                                 queue.close();
-                                log.info(Thread.currentThread().getName()+" placed message successfully at " + config.getQueue() + " queue and closed");
+                                log.info(Thread.currentThread().getName() + " placed message successfully at " + config.getQueue() + " queue and closed");
                             } catch (MQException e) {
                                 e.printStackTrace();
                             }
@@ -142,7 +145,7 @@ public class MQPublishQueue extends AbstractConnector {
      * Initialize queue
      */
     MQQueue setQueue(MQConnectionBuilder connectionBuilder, MQConfiguration config) {
-        MQQueueManager manager = connectionBuilder.getQueueManager();
+        MQQueueManager manager = connectionBuilder.getManager();
         MQQueue queue;
         try {
             queue = manager.accessQueue(config.getQueue(), CMQC.MQOO_OUTPUT);
@@ -409,7 +412,7 @@ public class MQPublishQueue extends AbstractConnector {
      * Initialize reply queue
      */
     MQQueue setReplyQueue(MQConnectionBuilder connectionBuilder, MQConfiguration config) {
-        MQQueueManager manager = connectionBuilder.getQueueManager();
+        MQQueueManager manager = connectionBuilder.getManager();
         MQQueue queue;
         try {
             queue = manager.accessQueue(config.getreplyQueue(), CMQC.MQRC_READ_AHEAD_MSGS);

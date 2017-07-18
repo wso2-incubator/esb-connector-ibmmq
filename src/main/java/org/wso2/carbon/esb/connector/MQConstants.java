@@ -51,5 +51,8 @@ public class MQConstants {
     public static final String REPLY_MESSAGE_QUEUE = "uri.var.replyQueue";
     public static final String REPLY_TIMEOUT = "uri.var.replyTimeout";
     public static final String ACCESS_MODE = "uri.var.accessMode";
+    public static final String CONNECTION_NAMELIST = "uri.var.connectionNamelist";
+    public static final String RECONNECT_TIMEOUT = "uri.var.reconnectTimeout";
+    public static final String CONNECTION_CHANNELLIST = "uri.var.channelList";
 
 }
