@@ -163,7 +163,6 @@
                 <messageID>MessageID@IBMMQ123</messageID>
                 <correlationID>CorrelationID@IBMMQ123</correlationID>
                 <groupID>GroupID@IBMMQ123</groupID>
-                <replyQueue>test</replyQueue>
                 <sslEnable>false</sslEnable>
                 <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
                 <flipsRequired>false</flipsRequired>
