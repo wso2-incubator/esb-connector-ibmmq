@@ -54,5 +54,5 @@ public class MQConstants {
     public static final String CONNECTION_NAMELIST = "uri.var.connectionNamelist";
     public static final String RECONNECT_TIMEOUT = "uri.var.reconnectTimeout";
     public static final String CONNECTION_CHANNELLIST = "uri.var.channelList";
-
+    public static final String LISTENER_ENABLED = "uri.var.islistenerEnabled";
 }

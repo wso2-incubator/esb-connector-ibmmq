@@ -67,21 +67,22 @@ public class MQConnectionBuilder {
         MQEnvironment.hdrCompList = headerComp;
         MQEnvironment.setDefaultConnectionManager(customizedPool(config.getTimeout(), config.getmaxConnections(), config.getmaxnusedConnections()));
 
-        Stack<String> hostandport;
+        Stack<String> hostandportList;
         Stack<String> channelList;
 
         if (config.getReconnectList() != null) {
-            hostandport = config.getReconnectList();
+            hostandportList = config.getReconnectList();
         } else {
-            hostandport = new Stack();
+            hostandportList = new Stack();
         }
+
         if (config.getChannelList() != null) {
             channelList = config.getChannelList();
         } else {
             channelList = new Stack();
         }
 
-        hostandport.push(config.getHost() + "/" + config.getPort());
+        hostandportList.push(config.getHost() + "/" + config.getPort());
         channelList.push(config.getChannel());
 
         try {
@@ -93,39 +94,33 @@ public class MQConnectionBuilder {
                     long end = start + config.getReconnectTimeout() * 1000;
 
                     boolean isConnected = false;
-                    boolean isTimeout = false;
                     String channel = "";
 
-                    for (int i = 0; !hostandport.empty(); i++) {
-                        String hostport[] = hostandport.pop().split("/");
-                        Stack<String> dupChannelList = channelList;
-                        for (int j = 0; j < dupChannelList.size(); j++) {
-                            try {
-                                logger.info("Trying to reconnect using host " + hostport[0] + ",port " + hostport[1] + " and channel " + channelList.peek());
-                                channel = dupChannelList.pop();
-                                queueManager = getQueueManager(hostport[0], channel, Integer.valueOf(hostport[1]));
-                                if (queueManager != null) {
-                                    isConnected = true;
-                                    break;
+                    while (System.currentTimeMillis() < end) {
+                        for (int i = 0; !hostandportList.empty(); i++) {
+                            String hostport[] = hostandportList.pop().split("/");
+                            Stack<String> dupChannelList = channelList;
+                            for (int j = 0; j < dupChannelList.size(); j++) {
+                                try {
+                                    logger.info("Trying to reconnect using host " + hostport[0] + ",port " + hostport[1] + " and channel " + channelList.peek());
+                                    channel = dupChannelList.pop();
+                                    queueManager = getQueueManager(hostport[0], channel, Integer.valueOf(hostport[1]));
+                                    if (queueManager != null) {
+                                        isConnected = true;
+                                        break;
+                                    }
+                                } catch (MQException e1) {
+                                    logger.info("Reconnecting");
                                 }
-                            } catch (MQException e1) {
-                                logger.info("Reconnecting");
                             }
-
-                            if (System.currentTimeMillis() > end) {
-                                isTimeout = true;
+                            if (isConnected) {
+                                logger.info("Queue Manager connected for " + hostport[0] + " " + hostport[1] + " " + channel);
                                 break;
                             }
                         }
                         if (isConnected) {
-                            logger.info("Queue Manager connected for " + hostport[0] + " " + hostport[1] + " " + channel);
                             break;
                         }
-                        if (isTimeout) {
-                            logger.info("Reconnection timed out");
-                            break;
-                        }
-
                     }
                 }
             }
@@ -153,7 +148,7 @@ public class MQConnectionBuilder {
         });
 
         try {
-            control.get(1, TimeUnit.SECONDS);
+            control.get(2, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {

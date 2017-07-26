@@ -49,6 +49,7 @@
     <parameter name="connectionNamelist" description="List of ports and hosts"/>
     <parameter name="reconnectTimeout" description="Timeout for reconnection"/>
     <parameter name="channelList" description="List of channels to reconnect"/>
+    <parameter name="islistenerEnabled" description="Listener for request or reply messages"/>
     <sequence>
         <property expression="$func:username" name="uri.var.username" scope="default" type="STRING"/>
         <property expression="$func:password" name="uri.var.password" scope="default" type="STRING"/>
@@ -83,5 +84,6 @@
                   type="STRING"/>
         <property expression="$func:reconnectTimeout" name="uri.var.reconnectTimeout" scope="default" type="STRING"/>
         <property expression="$func:channelList" name="uri.var.channelList" scope="default" type="STRING"/>
+        <property expression="$func:islistenerEnabled" name="uri.var.islistenerEnabled" scope="default" type="STRING"/>
     </sequence>
 </template>

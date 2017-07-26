@@ -58,6 +58,7 @@ public class MQConfiguration {
     private int priority;
     private int replyTimeout;
     private String accessMode;
+    private boolean islistenerEnabled;
     private Stack reconnectList = new Stack();
     private int reconnectTimeout;
     private Stack channelList = new Stack();
@@ -134,6 +135,12 @@ public class MQConfiguration {
             }
         } else {
             this.sslEnable = false;
+        }
+
+        if (msg.getProperty(MQConstants.LISTENER_ENABLED) != null) {
+            islistenerEnabled = Boolean.valueOf((String) msg.getProperty(MQConstants.SSL_ENABLE));
+        } else {
+            islistenerEnabled = false;
         }
 
         if (msg.getProperty(MQConstants.TIMEOUT) != null) {
@@ -397,6 +404,10 @@ public class MQConfiguration {
 
     public Stack getChannelList() {
         return channelList;
+    }
+
+    public boolean isIslistenerEnabled() {
+        return islistenerEnabled;
     }
 
 }
