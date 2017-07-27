@@ -17,7 +17,11 @@
 */
 package org.wso2.carbon.esb.connector;
 
-import com.ibm.mq.*;
+import com.ibm.mq.MQQueue;
+import com.ibm.mq.MQQueueManager;
+import com.ibm.mq.MQMessage;
+import com.ibm.mq.MQException;
+import com.ibm.mq.MQGetMessageOptions;
 import com.ibm.mq.constants.CMQC;
 import com.ibm.mq.constants.MQConstants;
 import com.ibm.mq.headers.MQMD;
@@ -26,13 +30,14 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
 import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import static com.ibm.mq.constants.CMQC.*;
 
 /**

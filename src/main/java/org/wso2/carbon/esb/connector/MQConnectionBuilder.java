@@ -33,6 +33,7 @@ import javax.net.ssl.TrustManagerFactory;
 import java.io.FileInputStream;
 import java.security.KeyStore;
 import java.util.Collection;
+import java.util.Properties;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.concurrent.*;
@@ -51,14 +52,16 @@ public class MQConnectionBuilder {
     MQConnectionBuilder(MessageContext msg) {
 
         this.config = new MQConfiguration(msg);
-
+        if(config.getCiphersuit().contains("TLS")) {
+            Properties props=System.getProperties();
+            props.setProperty("com.ibm.mq.cfg.useIBMCipherMappings", "false");
+        }
         if (config.isSslEnable()) {
             MQEnvironment.sslCipherSuite = config.getCiphersuit();
             MQEnvironment.sslSocketFactory = createSSLContext().getSocketFactory();
             MQEnvironment.sslCipherSuite = config.getCiphersuit();
             MQEnvironment.sslFipsRequired = config.getFlipRequired();
         }
-
         MQEnvironment.properties.put(CMQC.TRANSPORT_PROPERTY, CMQC.TRANSPORT_MQSERIES_CLIENT);
         MQEnvironment.properties.put(CMQC.USER_ID_PROPERTY, config.getUserName());
         MQEnvironment.properties.put(CMQC.PASSWORD_PROPERTY, config.getPassword());
