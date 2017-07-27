@@ -22,25 +22,36 @@
 4. qmanager - Name of the IBM MQ queue manager
 5. channel - Name of the IBM MQ remote channel
 6. queue - Name of the queue
-7. messageType - MQMT_REPLY,MQMT_DATAGRAM,MQMT_REQUEST,MQMT_REPORT
-8. persistent - true/false whether the message need to be logged and stored or not
-9. priority - defines a ten-level priority value with 0 as the lowest priority and 9 as the highest.
-10. maxconnections - number of maximum connections managed by the connection pool
-11. maxunusedconnections - the number of mamximum unused connections in the pool
-12. timeout - Ends connections that are not used for "timeout" time
-13. sslenabled - true/false
-14. ciphersuit - cipher suit for the connection
+7. messageType 
+    * [MQMT_REPLY](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q022870_.htm#q022870___Reply_messages)-Use a reply message when you reply to another message.
+    * [MQMT_DATAGRAM](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q022870_.htm#q022870___Datagrams)-Use a datagram when you do not require a reply from the application that receives the message (that is, gets the message from the queue).
+    * [MQMT_REQUEST](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q022870_.htm#q022870___Request_messages)-Use a request message when you want a reply from the application that receives the message.
+    * [MQMT_REPORT](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q022870_.htm#q022870___Report_messages)-Report messages inform applications about events such as the occurrence of an error when processing a message.
+8. [persistent](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_8.0.0/com.ibm.mq.dev.doc/q023070_.htm) - If a queue manager is restarted after a failure, it recovers these persistent messages as necessary from the logged data. Messages that are not persistent are discarded if a queue manager stops, whether the stoppage is as a result of an operator command or because of the failure of some part of your system.
+9. [priority](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q022910_.htm) - You can set a numeric value for the priority, or you can let the message take the default priority of the queue.The MsgDeliverySequence attribute of the queue determines whether messages on the queue are stored in FIFO (first in, first out) sequence, or in FIFO within priority sequence. If this attribute is set to MQMDS_PRIORITY, messages are enqueued with the priority specified in the Priority field of their message descriptors; but if it is set to MQMDS_FIFO, messages are enqueued with the default priority of the queue. Messages of equal priority are stored on the queue in order of arrival.
+10. maxconnections - number of maximum connections managed by the customized connection pool for ibm mq connections [connection pool](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q031110_.htm)
+11. maxunusedconnections - the number of mamximum unused connections in the customized connection pool for ibm mq connections [connection pool](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q031110_.htm)
+12. timeout - Ends connections that are not used for this time in customized connection pool for ibm mq connections [connection pool](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q031110_.htm)
+13. sslenabled - whether or not the ssl connection is needed or not (true/false)
+14. ciphersuit - cipher suit specification for ibm mq connections.For further understanding refer [here](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q031290_.htm)Note that IBM MQ versions below 8.0.0.3 does not support many cipher specs.Update the IBM MQ using fix packs as mentioned in [this](http://www-01.ibm.com/support/docview.wss?uid=swg27006037) tutorial. 
 15. trustStore - wso2carbon.jks
 16. trustpassword - wso2carbon
 17. keyStore - wso2carbon.jks
 18. keyPassword - wso2carbon
-19. correlationID/messageID/groupID - IDs for link messages
-20. accessMode - Exclusive/Shared whether the queue operations can initialize in parallel or sequential pattern
-21. replyQueue - The queue which the reply message or the report message should dispatch if the message type is MQMT_REQUEST or MQMT_REPORT
-22. replyTimeout - Timeout for the listener of the replyQueue 
-23. connectionNamelist - List of hosts and ports in case of connection failure
-24. channelList - List of channels in case of connection failure
-25. reconnectionTimeout - Reconnection timeout
+19. [correlationID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-The CorrelationId to be included in the MQMD of a message when put on a queue. Also the ID to be matched against when getting a message from a queue.
+20. [messageID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-The MessageId to be included in the MQMD of a message when put on a queue. Also the ID to be matched against when getting a message from a queue.Its initial value is all nulls.
+21. [groupID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-This is a byte string that is used to identify the particular message group or logical message to which the physical message belongs.
+22. accessMode - "Exclusive" or "Shared" whether the queue operations can initialize in parallel or sequential pattern
+23. replyQueue - The queue which the reply message or the report message should dispatch if the message type is MQMT_REQUEST or MQMT_REPORT
+24. replyTimeout - Timeout for the listener of the replyQueue 
+25. connectionNamelist - Reconnection parameters in case of connection failure.Add the list of hosts and ports here to connector to retry for the connections.
+26. channelList - Reconnection parameters in case of connection failure.Add list of to connector to retry for the connections.
+27. reconnectionTimeout - Reconnection parameters in case of connection failure .Add reconnection timeout for the reconnection.
+28. islistenerEnabled - setting this to true enables a listener for MQMT_REPORT or a MQMT_REQUEST message within the connector
+
+#### Basic flow chart of the connector operation
+
+![finaldiagram](https://user-images.githubusercontent.com/11781930/28656285-ab6723aa-72be-11e7-81b4-fa5d66f8ac51.png)
 
 #### Sample proxy service without ssl
 ```
