@@ -96,7 +96,7 @@ public class MQConnectionBuilder {
                     boolean isConnected = false;
                     String channel = "";
 
-                    while (System.currentTimeMillis() < end) {
+                    A:while (System.currentTimeMillis() < end) {
                         for (int i = 0; !hostandportList.empty(); i++) {
                             String hostport[] = hostandportList.pop().split("/");
                             Stack<String> dupChannelList = channelList;
@@ -115,11 +115,8 @@ public class MQConnectionBuilder {
                             }
                             if (isConnected) {
                                 logger.info("Queue Manager connected for " + hostport[0] + " " + hostport[1] + " " + channel);
-                                break;
+                                break A;
                             }
-                        }
-                        if (isConnected) {
-                            break;
                         }
                     }
                 }
