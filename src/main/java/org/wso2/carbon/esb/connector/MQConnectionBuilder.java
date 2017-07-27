@@ -96,9 +96,11 @@ public class MQConnectionBuilder {
                     boolean isConnected = false;
                     String channel = "";
 
-                    A:while (System.currentTimeMillis() < end) {
-                        for (int i = 0; !hostandportList.empty(); i++) {
-                            String hostport[] = hostandportList.pop().split("/");
+                    A:
+                    while (System.currentTimeMillis() < end) {
+                        Stack<String> duphostandportList = hostandportList;
+                        while (!duphostandportList.empty()) {
+                            String hostport[] = duphostandportList.pop().split("/");
                             Stack<String> dupChannelList = channelList;
                             for (int j = 0; j < dupChannelList.size(); j++) {
                                 try {
