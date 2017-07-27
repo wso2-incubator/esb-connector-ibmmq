@@ -339,7 +339,6 @@ public class MQPublishQueue extends AbstractConnector {
      */
     void getReportMessage(final MQQueue replyQueue, MQConfiguration config) {
 
-        final AtomicBoolean received = new AtomicBoolean(false);
         final MQMessage message = new MQMessage();
         final MQGetMessageOptions gmo = new MQGetMessageOptions();
 
