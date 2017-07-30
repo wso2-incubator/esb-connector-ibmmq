@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+
+   WSO2 Inc. licenses this file to you under the Apache License,
+   Version 2.0 (the "License"); you may not use this file except
+   in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied. See the License for the
+   specific language governing permissions and limitations
+   under the License.-->
+
+<template name="init" onError="fault" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="username" description="user of the IBM-MQ installation"/>
+    <parameter name="password" description="password of the user IBM-MQ installation"/>
+    <parameter name="topicname" description="topic of the publisher"/>
+    <parameter name="topicstring" description="topic of the publisher"/>
+    <parameter name="port" description="port for the TCP connection"/>
+    <parameter name="host" description="host need to connect"/>
+    <parameter name="qmanager" description="name of the queue manager"/>
+    <parameter name="queue" description="name of the queue"/>
+    <parameter name="channel" description="name of the channel"/>
+    <parameter name="transportType" description="transport type"/>
+    <parameter name="timeout" description="timeout of the pool"/>
+    <parameter name="maxconnections" description="maxconnection of the pool"/>
+    <parameter name="maxunusedconnections" description="max unused connections of the pool"/>
+    <parameter name="ciphersuit" description="ciphersuit for the ssl connection"/>
+    <parameter name="flipsRequired" description="flips no/yes"/>
+    <parameter name="sslEnable" description="ssl enable yes/no"/>
+    <parameter name="trustStore" description="path of the trustStore"/>
+    <parameter name="trustPassword" description="password of the truststore"/>
+    <parameter name="keyStore" description="password of the keyStore"/>
+    <parameter name="keyPassword" description="password of the keyStore"/>
+    <parameter name="messageID" description="message id"/>
+    <parameter name="correlationID" description="correlation id"/>
+    <parameter name="groupID" description="group id"/>
+    <parameter name="replyQueue" description="reply queue"/>
+    <parameter name="messageType" description="Type of message"/>
+    <parameter name="priority" description="Priority of the message"/>
+    <parameter name="persistent" description="Message is persistent or not"/>
+    <parameter name="replyTimeout" description="Timeout for reply message"/>
+    <parameter name="accessMode" description="Type of access"/>
+    <parameter name="connectionNamelist" description="List of ports and hosts"/>
+    <parameter name="reconnectTimeout" description="Timeout for reconnection"/>
+    <parameter name="channelList" description="List of channels to reconnect"/>
+    <parameter name="islistenerEnabled" description="Listener for request or reply messages"/>
+    <sequence>
+        <property expression="$func:username" name="uri.var.username" scope="default" type="STRING"/>
+        <property expression="$func:password" name="uri.var.password" scope="default" type="STRING"/>
+        <property expression="$func:topicname" name="uri.var.topicname" scope="default" type="STRING"/>
+        <property expression="$func:topicstring" name="uri.var.topicstring" scope="default" type="STRING"/>
+        <property expression="$func:port" name="uri.var.port" scope="default" type="STRING"/>
+        <property expression="$func:host" name="uri.var.host" scope="default" type="STRING"/>
+        <property expression="$func:qmanager" name="uri.var.qmanager" scope="default" type="STRING"/>
+        <property expression="$func:queue" name="uri.var.queue" scope="default" type="STRING"/>
+        <property expression="$func:channel" name="uri.var.channel" scope="default" type="STRING"/>
+        <property expression="$func:transportType" name="uri.var.transportType" scope="default" type="STRING"/>
+        <property expression="$func:timeout" name="uri.var.timeout" scope="default" type="STRING"/>
+        <property expression="$func:maxconnections" name="uri.var.maxconnections" scope="default" type="STRING"/>
+        <property expression="$func:maxunusedconnections" name="uri.var.maxunusedconnections" scope="default"
+                  type="STRING"/>
+        <property expression="$func:ciphersuit" name="uri.var.ciphersuit" scope="default" type="STRING"/>
+        <property expression="$func:flipsRequired" name="uri.var.flipsRequired" scope="default" type="STRING"/>
+        <property expression="$func:sslEnable" name="uri.var.sslEnable" scope="default" type="STRING"/>
+        <property expression="$func:trustStore" name="uri.var.trustStore" scope="default" type="STRING"/>
+        <property expression="$func:trustPassword" name="uri.var.trustPassword" scope="default" type="STRING"/>
+        <property expression="$func:keyStore" name="uri.var.keyStore" scope="default" type="STRING"/>
+        <property expression="$func:keyPassword" name="uri.var.keyPassword" scope="default" type="STRING"/>
+        <property expression="$func:correlationID" name="uri.var.correlationID" scope="default" type="STRING"/>
+        <property expression="$func:messageID" name="uri.var.messageID" scope="default" type="STRING"/>
+        <property expression="$func:groupID" name="uri.var.groupID" scope="default" type="STRING"/>
+        <property expression="$func:messageType" name="uri.var.messageType" scope="default" type="STRING"/>
+        <property expression="$func:replyQueue" name="uri.var.replyQueue" scope="default" type="STRING"/>
+        <property expression="$func:priority" name="uri.var.priority" scope="default" type="STRING"/>
+        <property expression="$func:persistent" name="uri.var.persistent" scope="default" type="STRING"/>
+        <property expression="$func:replyTimeout" name="uri.var.replyTimeout" scope="default" type="STRING"/>
+        <property expression="$func:connectionNamelist" name="uri.var.connectionNamelist" scope="default"
+                  type="STRING"/>
+        <property expression="$func:reconnectTimeout" name="uri.var.reconnectTimeout" scope="default" type="STRING"/>
+        <property expression="$func:channelList" name="uri.var.channelList" scope="default" type="STRING"/>
+        <property expression="$func:islistenerEnabled" name="uri.var.islistenerEnabled" scope="default" type="STRING"/>
+    </sequence>
+</template>
