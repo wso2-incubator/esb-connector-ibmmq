@@ -45,7 +45,6 @@
     <parameter name="priority" description="Priority of the message"/>
     <parameter name="persistent" description="Message is persistent or not"/>
     <parameter name="replyTimeout" description="Timeout for reply message"/>
-    <parameter name="accessMode" description="Type of access"/>
     <parameter name="connectionNamelist" description="List of ports and hosts"/>
     <parameter name="reconnectTimeout" description="Timeout for reconnection"/>
     <parameter name="channelList" description="List of channels to reconnect"/>

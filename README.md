@@ -55,13 +55,12 @@ TLS_RSA_WITH_AES_256_CBC_SHA256  | TLS_RSA_WITH_AES_256_CBC_SHA256 |False
 19. [correlationID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-The CorrelationId to be included in the MQMD of a message when put on a queue. Also the ID to be matched against when getting a message from a queue.
 20. [messageID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-The MessageId to be included in the MQMD of a message when put on a queue. Also the ID to be matched against when getting a message from a queue.Its initial value is all nulls.
 21. [groupID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-This is a byte string that is used to identify the particular message group or logical message to which the physical message belongs.
-22. accessMode - "Exclusive" or "Shared" whether the queue operations can initialize in parallel or sequential pattern
-23. replyQueue - The queue which the reply message or the report message should dispatch if the message type is MQMT_REQUEST or MQMT_REPORT
-24. replyTimeout - Timeout for the listener of the replyQueue 
-25. connectionNamelist - Reconnection parameters in case of connection failure.Add the list of hosts and ports here to connector to retry for the connections.
-26. channelList - Reconnection parameters in case of connection failure.Add list of to connector to retry for the connections.
-27. reconnectionTimeout - Reconnection parameters in case of connection failure .Add reconnection timeout for the reconnection.
-28. islistenerEnabled - setting this to true enables a listener for MQMT_REPORT or a MQMT_REQUEST message within the connector
+22. replyQueue - The queue which the reply message or the report message should dispatch if the message type is MQMT_REQUEST or MQMT_REPORT
+23. replyTimeout - Timeout for the listener of the replyQueue 
+24. connectionNamelist - Reconnection parameters in case of connection failure.Add the list of hosts and ports here to connector to retry for the connections.
+25. channelList - Reconnection parameters in case of connection failure.Add list of to connector to retry for the connections.
+26. reconnectionTimeout - Reconnection parameters in case of connection failure .Add reconnection timeout for the reconnection.
+27. islistenerEnabled - setting this to true enables a listener for MQMT_REPORT or a MQMT_REQUEST message within the connector
 
 #### Basic flow chart of the connector operation
 

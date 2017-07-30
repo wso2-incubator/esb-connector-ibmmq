@@ -17,11 +17,7 @@
 */
 package org.wso2.carbon.esb.connector;
 
-import com.ibm.mq.MQQueue;
-import com.ibm.mq.MQQueueManager;
-import com.ibm.mq.MQMessage;
-import com.ibm.mq.MQException;
-import com.ibm.mq.MQGetMessageOptions;
+import com.ibm.mq.*;
 import com.ibm.mq.constants.CMQC;
 import com.ibm.mq.constants.MQConstants;
 import com.ibm.mq.headers.MQMD;
@@ -30,14 +26,15 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
 import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
+
 import java.io.IOException;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import static com.ibm.mq.constants.CMQC.*;
 
 /**
@@ -62,81 +59,39 @@ public class MQPublishQueue extends AbstractConnector {
             if (getElement != null) {
                 queueMessage = getElement.toString();
             } else {
-                queueMessage = "Empty payload";
+                queueMessage = "";
             }
 
             //access queue manager
-            connectionBuilder = new MQConnectionBuilder(messageContext);
-            config = connectionBuilder.getConfig();
-
-            String accessMode = config.getAccessMode();
-
-            if (accessMode.equals("Exclusive")) {
-
-                MQQueue queue = setQueue(connectionBuilder, config);
-                int messageType = config.getMessageType();
-                MQMessage mqMessage;
-
-                switch (messageType) {
-                    case 1:
-                        mqMessage = buildRequestMessageandGetResponse(config, queueMessage);
-                        break;
-                    case 4:
-                        mqMessage = buildReportMessage(config, queueMessage);
-                        break;
-                    default:
-                        mqMessage = buildDatagramOrReplyMessage(config, queueMessage);
-                }
-
-                if (queue == null || mqMessage == null) {
-                    log.error("Error in publishing message");
-                } else {
-                    log.info("queue initialized");
-                    queue.put(mqMessage);
-                    queue.close();
-                    log.info("Message successfully placed at " + config.getQueue() + " queue and closed");
-                }
-                connectionBuilder.closeConnection();
-
-            } else if (accessMode.equals("Shared")) {
-
-                final String messagetoDeliver = queueMessage;
-
-                Executor executor = Executors.newFixedThreadPool(1);
-                executor.execute(new Runnable() {
-
-                    public void run() {
-
-                        MQMessage mqMessage;
-                        int messageType = config.getMessageType();
-                        final MQQueue queue = setQueue(connectionBuilder, config);
-
-                        switch (messageType) {
-                            case 1:
-                                mqMessage = buildRequestMessageandGetResponse(config, messagetoDeliver);
-                                break;
-                            case 4:
-                                mqMessage = buildReportMessage(config, messagetoDeliver);
-                                break;
-                            default:
-                                mqMessage = buildDatagramOrReplyMessage(config, messagetoDeliver);
-                        }
-
-                        if (queue == null || mqMessage == null) {
-                            log.error("Error in publishing message");
-                        } else {
-                            log.info("queue initialized");
-                            try {
-                                queue.put(mqMessage);
-                                queue.close();
-                                log.info(Thread.currentThread().getName() + " placed message successfully at " + config.getQueue() + " queue and closed");
-                            } catch (MQException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                });
+            if(connectionBuilder==null || connectionBuilder.getManager()==null) {
+                connectionBuilder = new MQConnectionBuilder(messageContext);
+                config = connectionBuilder.getConfig();
             }
+
+            MQQueue queue = setQueue(connectionBuilder, config);
+            int messageType = config.getMessageType();
+            MQMessage mqMessage;
+
+            switch (messageType) {
+                case 1:
+                    mqMessage = buildRequestMessageandGetResponse(config, queueMessage);
+                    break;
+                case 4:
+                    mqMessage = buildReportMessage(config, queueMessage);
+                    break;
+                default:
+                    mqMessage = buildDatagramOrReplyMessage(config, queueMessage);
+            }
+
+            if (queue == null || mqMessage == null) {
+                log.error("Error in publishing message");
+            } else {
+                log.info("queue initialized");
+                queue.put(mqMessage);
+                queue.close();
+                log.info("Message successfully placed at " + config.getQueue() + " queue and closed");
+            }
+
         } catch (Exception e) {
             log.error("Problem in publishing to message" + e);
             throw new ConnectException(e);
@@ -262,32 +217,31 @@ public class MQPublishQueue extends AbstractConnector {
         if (config.isIslistenerEnabled()) {
             final Future<?>[] listener = {null};
             ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-            listener[0] = scheduler.scheduleAtFixedRate(new Runnable() {
-                public void run() {
-                    try {
-                        replyQueue.get(message, gmo);
-                        log.info("Reply received");
-                        MQMD md = new MQMD();
-                        md.copyFrom(message);
-                        message.getDataLength();
-                        log.info("Correlation ID " + new String(message.correlationId));
-                        log.info("Message ID " + new String(message.messageId));
-                        int strLen = message.getDataLength();
-                        byte[] strData = new byte[strLen];
-                        message.readFully(strData);
-                        log.info("Reply-\n" + new String(strData));
-                        Future<?> future;
-                        while (null == (future = listener[0])) {
-                            Thread.yield();
-                        }
-                        future.cancel(false);
-                        return;
-                    } catch (MQException e) {
-                        log.info("Waiting for a reply");
-                    } catch (IOException e) {
-
+            listener[0] = scheduler.scheduleAtFixedRate(() -> {
+                try {
+                    replyQueue.get(message, gmo);
+                    log.info("Reply received");
+                    MQMD md = new MQMD();
+                    md.copyFrom(message);
+                    message.getDataLength();
+                    log.info("Correlation ID " + new String(message.correlationId));
+                    log.info("Message ID " + new String(message.messageId));
+                    int strLen = message.getDataLength();
+                    byte[] strData = new byte[strLen];
+                    message.readFully(strData);
+                    log.info("Reply-\n" + new String(strData));
+                    Future<?> future;
+                    while (null == (future = listener[0])) {
+                        Thread.yield();
                     }
+                    future.cancel(false);
+                    return;
+                } catch (MQException e) {
+                    log.info("Waiting for a reply");
+                } catch (IOException e) {
+
                 }
+
             }, 0, config.getReplyTimeout(), TimeUnit.SECONDS);
         }
     }
@@ -355,23 +309,22 @@ public class MQPublishQueue extends AbstractConnector {
         if (config.isIslistenerEnabled()) {
             final Future<?>[] listener = {null};
             ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-            listener[0] = scheduler.scheduleAtFixedRate(new Runnable() {
-                public void run() {
-                    try {
-                        replyQueue.get(message, gmo);
-                        MQMD md = new MQMD();
-                        md.copyFrom(message);
-                        log.info("Report" + reportStr(md.getFeedback()));
-                        Future<?> future;
-                        while (null == (future = listener[0])) {
-                            Thread.yield();
-                        }
-                        future.cancel(false);
-                        return;
-                    } catch (MQException e) {
-                        log.info("Waiting for reply message");
+            listener[0] = scheduler.scheduleAtFixedRate(() -> {
+                try {
+                    replyQueue.get(message, gmo);
+                    MQMD md = new MQMD();
+                    md.copyFrom(message);
+                    log.info("Report" + reportStr(md.getFeedback()));
+                    Future<?> future;
+                    while (null == (future = listener[0])) {
+                        Thread.yield();
                     }
+                    future.cancel(false);
+                    return;
+                } catch (MQException e) {
+                    log.info("Waiting for reply message");
                 }
+
             }, 0, config.getReplyTimeout(), TimeUnit.SECONDS);
         }
     }
