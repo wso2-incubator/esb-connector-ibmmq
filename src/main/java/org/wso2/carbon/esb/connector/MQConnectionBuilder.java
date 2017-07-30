@@ -142,7 +142,6 @@ public class MQConnectionBuilder {
 
         Future<String> control
                 = Executors.newSingleThreadExecutor().submit(new Callable<String>() {
-            @Override
             public String call() throws Exception {
                 queueManager = new MQQueueManager(config.getqManger());
                 return "Initialized";
