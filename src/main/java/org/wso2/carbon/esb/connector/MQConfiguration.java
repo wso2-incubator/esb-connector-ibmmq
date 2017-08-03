@@ -20,7 +20,9 @@ package org.wso2.carbon.esb.connector;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 
-import java.util.Stack;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.ibm.mq.constants.CMQC.*;
 
@@ -57,11 +59,10 @@ public class MQConfiguration {
     private String replyQueue;
     private int priority;
     private int replyTimeout;
-    private String accessMode;
     private boolean islistenerEnabled;
-    private Stack reconnectList = new Stack();
+    private List<String> reconnectList = new ArrayList();
     private int reconnectTimeout;
-    private Stack channelList = new Stack();
+    private List<String> channelList = new ArrayList<>();
 
     MQConfiguration(MessageContext msg) {
 
@@ -97,18 +98,9 @@ public class MQConfiguration {
         }
 
         if (msg.getProperty(MQConstants.CONNECTION_NAMELIST) != null) {
-            String connectionNameList[] = ((String) msg.getProperty(MQConstants.CONNECTION_NAMELIST)).split(",");
-            for (String item : connectionNameList) {
-                reconnectList.push(item);
-            }
+            Arrays.asList(((String) msg.getProperty(MQConstants.CONNECTION_NAMELIST)).split(",")).forEach(item -> reconnectList.add(item));
         } else {
             reconnectList = null;
-        }
-
-        if (msg.getProperty(MQConstants.ACCESS_MODE) != null) {
-            this.accessMode = (String) msg.getProperty(MQConstants.ACCESS_MODE);
-        } else {
-            this.accessMode = "Exclusive";
         }
 
         if (msg.getProperty(MQConstants.TOPIC_STRING) != null) {
@@ -118,10 +110,7 @@ public class MQConfiguration {
         }
 
         if (msg.getProperty(MQConstants.CONNECTION_CHANNELLIST) != null) {
-            String channelArray[] = ((String) msg.getProperty(MQConstants.CONNECTION_CHANNELLIST)).split(",");
-            for (String item : channelArray) {
-                channelList.push(item);
-            }
+            Arrays.asList(((String) msg.getProperty(MQConstants.CONNECTION_CHANNELLIST)).split(",")).forEach(item -> channelList.add(item));
         } else {
             channelList = null;
         }
@@ -390,11 +379,7 @@ public class MQConfiguration {
         return priority;
     }
 
-    public String getAccessMode() {
-        return accessMode;
-    }
-
-    public Stack getReconnectList() {
+    public List<String> getReconnectList() {
         return reconnectList;
     }
 
@@ -402,7 +387,7 @@ public class MQConfiguration {
         return reconnectTimeout;
     }
 
-    public Stack getChannelList() {
+    public List<String> getChannelList() {
         return channelList;
     }
 

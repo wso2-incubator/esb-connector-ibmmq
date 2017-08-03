@@ -32,10 +32,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.FileInputStream;
 import java.security.KeyStore;
-import java.util.Collection;
-import java.util.Properties;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -45,15 +42,15 @@ public class MQConnectionBuilder {
 
     private static final Log logger = LogFactory.getLog(MQConnectionBuilder.class);
 
-    private static MQQueueManager queueManager = null;
+    private MQQueueManager queueManager;
 
     private MQConfiguration config;
 
     MQConnectionBuilder(MessageContext msg) {
 
         this.config = new MQConfiguration(msg);
-        if(config.getCiphersuit().contains("TLS")) {
-            Properties props=System.getProperties();
+        if (config.getCiphersuit().contains("TLS")) {
+            Properties props = System.getProperties();
             props.setProperty("com.ibm.mq.cfg.useIBMCipherMappings", "false");
         }
         if (config.isSslEnable()) {
@@ -70,94 +67,74 @@ public class MQConnectionBuilder {
         MQEnvironment.hdrCompList = headerComp;
         MQEnvironment.setDefaultConnectionManager(customizedPool(config.getTimeout(), config.getmaxConnections(), config.getmaxnusedConnections()));
 
-        Stack<String> hostandportList;
-        Stack<String> channelList;
+        List<String> hostandportList;
+        List<String> channelList;
 
         if (config.getReconnectList() != null) {
             hostandportList = config.getReconnectList();
         } else {
-            hostandportList = new Stack();
+            hostandportList = new ArrayList<>();
         }
 
         if (config.getChannelList() != null) {
             channelList = config.getChannelList();
         } else {
-            channelList = new Stack();
+            channelList = new ArrayList<>();
         }
 
-        hostandportList.push(config.getHost() + "/" + config.getPort());
-        channelList.push(config.getChannel());
+        hostandportList.add(0, config.getHost() + "/" + config.getPort());
+        channelList.add(0, config.getChannel());
 
-        try {
-            if (queueManager == null || !queueManager.isConnected()) {
-                queueManager = getQueueManager(config.getHost(), config.getChannel(), config.getPort());
-                if (queueManager == null) {
+        if (queueManager == null || !queueManager.isConnected()) {
+            queueManager = getQueueManager(config.getHost(), config.getChannel(), config.getPort());
+            if (queueManager == null) {
 
-                    long start = System.currentTimeMillis();
-                    long end = start + config.getReconnectTimeout() * 1000;
-
-                    boolean isConnected = false;
-                    String channel = "";
-
-                    A:
-                    while (System.currentTimeMillis() < end) {
-                        Stack<String> duphostandportList = hostandportList;
-                        while (!duphostandportList.empty()) {
-                            String hostport[] = duphostandportList.pop().split("/");
-                            Stack<String> dupChannelList = channelList;
-                            for (int j = 0; j < dupChannelList.size(); j++) {
-                                try {
-                                    logger.info("Trying to reconnect using host " + hostport[0] + ",port " + hostport[1] + " and channel " + channelList.peek());
-                                    channel = dupChannelList.pop();
-                                    queueManager = getQueueManager(hostport[0], channel, Integer.valueOf(hostport[1]));
-                                    if (queueManager != null) {
-                                        isConnected = true;
-                                        break;
-                                    }
-                                } catch (MQException e1) {
-                                    logger.info("Reconnecting");
-                                }
-                            }
-                            if (isConnected) {
-                                logger.info("Queue Manager connected for " + hostport[0] + " " + hostport[1] + " " + channel);
+                long start = System.currentTimeMillis();
+                long end = start + config.getReconnectTimeout() * 1000;
+                A:
+                while (System.currentTimeMillis() < end) {
+                    for (String hostandport : hostandportList) {
+                        String[] hostandportArray = hostandport.split("/");
+                        for (String channel : channelList) {
+                            queueManager = getQueueManager(hostandportArray[0], channel, Integer.valueOf(hostandportArray[1]));
+                            if (queueManager != null) {
                                 break A;
                             }
                         }
                     }
                 }
             }
-        } catch (MQException e) {
-            logger.info("Error initializing queue manager");
         }
     }
 
     /**
      * Initialize queue manager
      */
-    public MQQueueManager getQueueManager(String host, String channel, int port) throws MQException {
+    public MQQueueManager getQueueManager(String host, String channel, int port) {
 
         MQEnvironment.hostname = host;
         MQEnvironment.channel = channel;
         MQEnvironment.port = port;
 
-        Future<String> control
-                = Executors.newSingleThreadExecutor().submit(new Callable<String>() {
-            @Override
-            public String call() throws Exception {
+        Future<String> initializeQmanager
+                = Executors.newSingleThreadExecutor().submit(() -> {
+            try {
                 queueManager = new MQQueueManager(config.getqManger());
                 return "Initialized";
+            } catch (MQException e) {
             }
+            return null;
         });
-
         try {
-            control.get(2, TimeUnit.SECONDS);
+            initializeQmanager.get(2, TimeUnit.SECONDS);
+            logger.info("Queue manager connection established for " + host + " " + port + " " + channel);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            return null;
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            return null;
         } catch (TimeoutException e) {
             logger.info("Connection timeout for " + host + " " + channel + " " + port);
-            control.cancel(true);
+            initializeQmanager.cancel(true);
             return null;
         }
         return queueManager;
