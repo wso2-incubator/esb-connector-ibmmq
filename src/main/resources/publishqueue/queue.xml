@@ -18,6 +18,6 @@
 
 <template name="queue" onError="fault" xmlns="http://ws.apache.org/ns/synapse">
     <sequence>
-        <class name="org.wso2.carbon.esb.connector.MQPublishQueue"/>
+        <class name="org.wso2.carbon.esb.connector.IBMMQPublishQueue"/>
     </sequence>
 </template>
