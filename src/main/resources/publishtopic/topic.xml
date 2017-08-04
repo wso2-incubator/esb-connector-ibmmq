@@ -18,6 +18,6 @@
 
 <template name="topic" onError="fault" xmlns="http://ws.apache.org/ns/synapse">
     <sequence>
-        <class name="org.wso2.carbon.esb.connector.MQPublishTopic"/>
+        <class name="org.wso2.carbon.esb.connector.IBMMQPublishTopic"/>
     </sequence>
 </template>

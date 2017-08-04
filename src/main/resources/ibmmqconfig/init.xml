@@ -31,7 +31,7 @@
     <parameter name="maxconnections" description="maxconnection of the pool"/>
     <parameter name="maxunusedconnections" description="max unused connections of the pool"/>
     <parameter name="ciphersuit" description="ciphersuit for the ssl connection"/>
-    <parameter name="flipsRequired" description="flips no/yes"/>
+    <parameter name="fipsRequired" description="fips no/yes"/>
     <parameter name="sslEnable" description="ssl enable yes/no"/>
     <parameter name="trustStore" description="path of the trustStore"/>
     <parameter name="trustPassword" description="password of the truststore"/>
@@ -40,15 +40,12 @@
     <parameter name="messageID" description="message id"/>
     <parameter name="correlationID" description="correlation id"/>
     <parameter name="groupID" description="group id"/>
-    <parameter name="replyQueue" description="reply queue"/>
     <parameter name="messageType" description="Type of message"/>
     <parameter name="priority" description="Priority of the message"/>
     <parameter name="persistent" description="Message is persistent or not"/>
-    <parameter name="replyTimeout" description="Timeout for reply message"/>
     <parameter name="connectionNamelist" description="List of ports and hosts"/>
     <parameter name="reconnectTimeout" description="Timeout for reconnection"/>
-    <parameter name="channelList" description="List of channels to reconnect"/>
-    <parameter name="islistenerEnabled" description="Listener for request or reply messages"/>
+    <parameter name="charSet" description="character set of the destination queue"/>
     <sequence>
         <property expression="$func:username" name="uri.var.username" scope="default" type="STRING"/>
         <property expression="$func:password" name="uri.var.password" scope="default" type="STRING"/>
@@ -65,7 +62,7 @@
         <property expression="$func:maxunusedconnections" name="uri.var.maxunusedconnections" scope="default"
                   type="STRING"/>
         <property expression="$func:ciphersuit" name="uri.var.ciphersuit" scope="default" type="STRING"/>
-        <property expression="$func:flipsRequired" name="uri.var.flipsRequired" scope="default" type="STRING"/>
+        <property expression="$func:fipsRequired" name="uri.var.fipsRequired" scope="default" type="STRING"/>
         <property expression="$func:sslEnable" name="uri.var.sslEnable" scope="default" type="STRING"/>
         <property expression="$func:trustStore" name="uri.var.trustStore" scope="default" type="STRING"/>
         <property expression="$func:trustPassword" name="uri.var.trustPassword" scope="default" type="STRING"/>
@@ -75,14 +72,11 @@
         <property expression="$func:messageID" name="uri.var.messageID" scope="default" type="STRING"/>
         <property expression="$func:groupID" name="uri.var.groupID" scope="default" type="STRING"/>
         <property expression="$func:messageType" name="uri.var.messageType" scope="default" type="STRING"/>
-        <property expression="$func:replyQueue" name="uri.var.replyQueue" scope="default" type="STRING"/>
         <property expression="$func:priority" name="uri.var.priority" scope="default" type="STRING"/>
         <property expression="$func:persistent" name="uri.var.persistent" scope="default" type="STRING"/>
-        <property expression="$func:replyTimeout" name="uri.var.replyTimeout" scope="default" type="STRING"/>
         <property expression="$func:connectionNamelist" name="uri.var.connectionNamelist" scope="default"
                   type="STRING"/>
         <property expression="$func:reconnectTimeout" name="uri.var.reconnectTimeout" scope="default" type="STRING"/>
-        <property expression="$func:channelList" name="uri.var.channelList" scope="default" type="STRING"/>
-        <property expression="$func:islistenerEnabled" name="uri.var.islistenerEnabled" scope="default" type="STRING"/>
+        <property expression="$func:charSet" name="uri.var.charSet" scope="default" type="STRING"/>
     </sequence>
 </template>
