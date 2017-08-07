@@ -83,7 +83,7 @@ public class IBMMQManageConnectionPool {
     public synchronized void InsertNewConnection(MQQueueManager queueManager, IBMMQConfiguration config) {
         if (config.getmaxConnections() > connectionPool.size()) {
             Object managerData[] = {queueManager, config.getTimeout() + "", System.currentTimeMillis() + "", System.currentTimeMillis() + ""};
-            connectionPool.put(config.getqManger() +"/"+ config.getCiphersuit(), managerData);
+            connectionPool.put(config.getqManger() + "/" + config.getCiphersuit(), managerData);
         } else {
             for (Map.Entry<String, Object[]> entry : connectionPool.entrySet()) {
                 Object[] data = entry.getValue();
@@ -107,15 +107,17 @@ public class IBMMQManageConnectionPool {
      * @param config IBMMQConfiguration object for get the connection parameters
      */
     public synchronized MQQueueManager PooledQueueManager(IBMMQConfiguration config) {
-        if (connectionPool.containsKey(config.getqManger()+"/"+config.getCiphersuit())) {
-            Object[] data = connectionPool.get(config.getqManger()+"/"+config.getCiphersuit());
-            MQQueueManager queueManager = (MQQueueManager)data[0];
+        if (connectionPool.containsKey(config.getqManger() + "/" + config.getCiphersuit())) {
+            Object[] data = connectionPool.get(config.getqManger() + "/" + config.getCiphersuit());
+            MQQueueManager queueManager = (MQQueueManager) data[0];
             if (queueManager.isConnected()) {
-                data[2]=System.currentTimeMillis();
+                data[2] = System.currentTimeMillis();
                 return queueManager;
             }
         }
-        logger.debug("Queue manager not available in connection pool");
+        if(logger.isDebugEnabled()) {
+            logger.debug("Queue manager not available in connection pool");
+        }
         return null;
     }
 }

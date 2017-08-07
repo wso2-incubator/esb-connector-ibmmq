@@ -56,7 +56,6 @@ import java.util.concurrent.TimeoutException;
 public class IBMMQConnectionUtils {
 
     private static final Log logger = LogFactory.getLog(IBMMQConnectionUtils.class);
-    private static Map<String, MQSimpleConnectionManager> poolHistory = new HashMap<>();
 
     /**
      * This method use to get a queue manager specified by the parameters in IBMMQConfiguration.class.
@@ -225,25 +224,32 @@ public class IBMMQConnectionUtils {
         MQQueueManager[] queueManager = {null};
         Future<String> manageConnection = Executors.newSingleThreadExecutor().submit(() -> {
             try {
-                logger.debug("Attempting connection using connection pool");
                 queueManager[0] = new MQQueueManager(config.getqManger(), mqEnvironment);
                 logger.info("Queue manager connection established " + message);
                 return "Connection established";
             } catch (MQException e) {
-                logger.debug("Connection with IBM MQ not established");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Connection with IBM MQ not established");
+                }
                 return "Connection not established";
             }
         });
         try {
             status = manageConnection.get(2, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            logger.debug(status);
+            if (logger.isDebugEnabled()) {
+                logger.debug(status);
+            }
             manageConnection.cancel(true);
         } catch (ExecutionException e) {
-            logger.debug(status);
+            if (logger.isDebugEnabled()) {
+                logger.debug(status);
+            }
             manageConnection.cancel(true);
         } catch (TimeoutException e) {
-            logger.debug(status);
+            if (logger.isDebugEnabled()) {
+                logger.debug(status);
+            }
             manageConnection.cancel(true);
         }
         return queueManager[0];

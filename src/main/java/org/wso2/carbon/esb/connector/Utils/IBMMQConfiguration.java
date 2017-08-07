@@ -70,24 +70,18 @@ public class IBMMQConfiguration {
     /**
      * Ends connections that are not used for this time in customized
      * connection pool for ibm mq connections
-     *
-     * @see http://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q031110_.htm
      */
     private long timeout;
 
     /**
      * number of maximum connections managed by the customized connection
      * pool for ibm mq connections
-     *
-     * @see http://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q031110_.htm
      */
     private int maxConnections;
 
     /**
      * the number of mamximum unused connections in the customized connection
      * pool for ibm mq connections
-     *
-     * @see http://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q031110_.htm
      */
     private int maxUnusedConnections;
 
@@ -99,9 +93,6 @@ public class IBMMQConfiguration {
     /**
      * cipher suit specification for ibm mq connections.Note that IBM MQ versions
      * below 8.0.0.3 does not support many cipher specs.Update the IBM MQ using fix packs.
-     *
-     * @see http://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q031290_.htm
-     * @see http://www-01.ibm.com/support/docview.wss?uid=swg27006037
      */
     private String ciphersuit;
 
