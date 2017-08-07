@@ -54,7 +54,6 @@ public class IBMMQPublishQueue extends AbstractConnector {
      * Connect method which is generating authentication of the connector for each request.
      *
      * @param messageContext ESB messageContext.
-     * @throws ConnectException
      * @see http://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.0.1/com.ibm.mq.csqsao.doc/fm12040_1.htm
      */
     @Override

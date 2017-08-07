@@ -44,19 +44,18 @@ TLS_RSA_WITH_AES_256_CBC_SHA256  | TLS_RSA_WITH_AES_256_CBC_SHA256 |False
 8. [persistent](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_8.0.0/com.ibm.mq.dev.doc/q023070_.htm) - If a queue manager is restarted after a failure, it recovers these persistent messages as necessary from the logged data. Messages that are not persistent are discarded if a queue manager stops, whether the stoppage is as a result of an operator command or because of the failure of some part of your system.
 9. [priority](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q022910_.htm) - You can set a numeric value for the priority, or you can let the message take the default priority of the queue.The MsgDeliverySequence attribute of the queue determines whether messages on the queue are stored in FIFO (first in, first out) sequence, or in FIFO within priority sequence. If this attribute is set to MQMDS_PRIORITY, messages are enqueued with the priority specified in the Priority field of their message descriptors; but if it is set to MQMDS_FIFO, messages are enqueued with the default priority of the queue. Messages of equal priority are stored on the queue in order of arrival.
 10. maxconnections - number of maximum connections managed by the customized [connection pool](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q031110_.htm) for ibm mq connections 
-11. maxunusedconnections - the number of mamximum unused connections in the customized connection pool for ibm mq connections
-12. timeout - Ends connections that are not used for this time in customized connection pool for ibm mq connections
-13. sslenabled - whether or not the ssl connection is needed or not (true/false)
-14. ciphersuit - cipher suit specification for ibm mq connections.For further understanding refer [here](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q031290_.htm)Note that IBM MQ versions below 8.0.0.3 does not support many cipher specs.Update the IBM MQ using fix packs as mentioned in [this](http://www-01.ibm.com/support/docview.wss?uid=swg27006037) tutorial. 
-15. trustStore - wso2carbon.jks
-16. trustpassword - wso2carbon
-17. keyStore - wso2carbon.jks
-18. keyPassword - wso2carbon
-19. [correlationID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-The CorrelationId to be included in the MQMD of a message when put on a queue. Also the ID to be matched against when getting a message from a queue.
-20. [messageID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-The MessageId to be included in the MQMD of a message when put on a queue. Also the ID to be matched against when getting a message from a queue.Its initial value is all nulls.
-21. [groupID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-This is a byte string that is used to identify the particular message group or logical message to which the physical message belongs.
-22. connectionNamelist - Reconnection parameters in case of connection failure.Add the list of hosts and ports here to connector to retry for the connections.
-23. reconnectionTimeout - Reconnection parameters in case of connection failure .Add reconnection timeout for the reconnection.
+11. timeout - Ends connections that are not used for this time in customized connection pool for ibm mq connections
+12. sslenabled - whether or not the ssl connection is needed or not (true/false)
+13. ciphersuit - cipher suit specification for ibm mq connections.For further understanding refer [here](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q031290_.htm)Note that IBM MQ versions below 8.0.0.3 does not support many cipher specs.Update the IBM MQ using fix packs as mentioned in [this](http://www-01.ibm.com/support/docview.wss?uid=swg27006037) tutorial. 
+14. trustStore - wso2carbon.jks
+15. trustpassword - wso2carbon
+16. keyStore - wso2carbon.jks
+17. keyPassword - wso2carbon
+18. [correlationID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-The CorrelationId to be included in the MQMD of a message when put on a queue. Also the ID to be matched against when getting a message from a queue.
+19. [messageID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-The MessageId to be included in the MQMD of a message when put on a queue. Also the ID to be matched against when getting a message from a queue.Its initial value is all nulls.
+20. [groupID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-This is a byte string that is used to identify the particular message group or logical message to which the physical message belongs.
+21. connectionNamelist - Reconnection parameters in case of connection failure.Add the list of hosts and ports here to connector to retry for the connections.
+22. reconnectionTimeout - Reconnection parameters in case of connection failure .Add reconnection timeout for the reconnection.
 
 #### Basic flow chart of the connector operation
 
@@ -87,7 +86,6 @@ TLS_RSA_WITH_AES_256_CBC_SHA256  | TLS_RSA_WITH_AES_256_CBC_SHA256 |False
                 <persistent>true</persistent>
                 <priority>3</priority>>
                 <maxconnections>75</maxconnections>
-                <maxunusedconnections>50</maxunusedconnections>
                 <timeout>3600</timeout>
                 <messageID>MessageID@IBMMQ123</messageID>
                 <correlationID>CorrelationID@IBMMQ123</correlationID>
@@ -127,7 +125,6 @@ TLS_RSA_WITH_AES_256_CBC_SHA256  | TLS_RSA_WITH_AES_256_CBC_SHA256 |False
                 <persistent>true</persistent>
                 <priority>3</priority>>
                 <maxconnections>75</maxconnections>
-                <maxunusedconnections>50</maxunusedconnections>
                 <timeout>3600</timeout>
                 <messageID>MessageID@IBMMQ123</messageID>
                 <correlationID>CorrelationID@IBMMQ123</correlationID>

@@ -38,8 +38,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
@@ -54,6 +56,7 @@ import java.util.concurrent.TimeoutException;
 public class IBMMQConnectionUtils {
 
     private static final Log logger = LogFactory.getLog(IBMMQConnectionUtils.class);
+    private static Map<String, MQSimpleConnectionManager> poolHistory = new HashMap<>();
 
     /**
      * This method use to get a queue manager specified by the parameters in IBMMQConfiguration.class.
@@ -78,46 +81,30 @@ public class IBMMQConnectionUtils {
             UnrecoverableKeyException,
             KeyManagementException {
 
-        MQQueueManager queueManager = null;
+        //Setting up environment for MQQueueManager connection
         Hashtable mqEnvironment = getMQEnvironment(config);
-        MQSimpleConnectionManager conManager = PoolToken(config);
-        List<String> reconnectList = config.getReconnectList();
-        ;
-        reconnectList.add(0, config.getHost() + "/" + config.getPort());
-        long start = System.currentTimeMillis();
-        long end = start + config.getReconnectTimeout();
-        A:
-        while (System.currentTimeMillis() < end) {
-            for (String conList : reconnectList) {
-                String[] conArray = conList.split("/");
-                mqEnvironment.put(MQConstants.HOST_NAME_PROPERTY, conArray[0]);
-                mqEnvironment.put(MQConstants.PORT_PROPERTY, Integer.valueOf(conArray[1]));
-                Future<MQQueueManager> manageConnection
-                        = Executors.newSingleThreadExecutor().submit(() -> {
-                    try {
-                        MQQueueManager qManager = new MQQueueManager(config.getqManger(), mqEnvironment, conManager);
-                        logger.info("Queue manager connection established for " + conArray[0] + " " + config.getChannel() + " " + conArray[1]);
-                        return qManager;
-                    } catch (MQException e) {
-                        logger.error(e + " exception in connecting to queue manager for " + conArray[0] + " " + config.getChannel() + " " + conArray[1]);
-                        return null;
-                    }
-                });
-                try {
-                    MQQueueManager dupManager = manageConnection.get(2, TimeUnit.SECONDS);
-                    queueManager = (queueManager == null) ? dupManager : queueManager;
+        IBMMQManageConnectionPool poolObject = IBMMQManageConnectionPool.getInstance();
+
+        //try the connection using connection pool
+        MQQueueManager queueManager = poolObject.PooledQueueManager(config);
+
+        //if the connection pool doesn't have a pooled connection
+        if (queueManager == null) {
+            List<String> reconnectList = config.getReconnectList();
+            reconnectList.add(config.getHost() + "/" + config.getPort());
+            long start = System.currentTimeMillis();
+            long end = start + config.getReconnectTimeout();
+            A:
+            while (System.currentTimeMillis() < end) {
+                for (String conList : reconnectList) {
+                    String[] conArray = conList.split("/");
+                    mqEnvironment.put(MQConstants.HOST_NAME_PROPERTY, conArray[0]);
+                    mqEnvironment.put(MQConstants.PORT_PROPERTY, Integer.valueOf(conArray[1]));
+                    queueManager = ConnectQueueManager(mqEnvironment, config, conArray[0] + " " + conArray[1] + " " + config.getChannel());
                     if (queueManager != null) {
+                        poolObject.InsertNewConnection(queueManager, config);
                         break A;
                     }
-                } catch (InterruptedException e) {
-                    logger.error("Queue manager connection thread interrupted", e);
-                    manageConnection.cancel(true);
-                } catch (ExecutionException e) {
-                    logger.error("Queue manager connection thread execution exception", e);
-                    manageConnection.cancel(true);
-                } catch (TimeoutException e) {
-                    logger.error("Connection timeout for " + conArray[0] + " " + config.getChannel() + " " + conArray[1]);
-                    manageConnection.cancel(true);
                 }
             }
         }
@@ -125,21 +112,6 @@ public class IBMMQConnectionUtils {
             logger.error("Reconnection timeout without establishing connection with the queue manager");
         }
         return queueManager;
-    }
-
-    /**
-     * Terminate the connection with queue manager.
-     *
-     * @param queueManager queue manager to close connection.
-     */
-    private static void closeConnection(MQQueueManager queueManager) {
-        try {
-            if (queueManager.isConnected()) {
-                queueManager.close();
-            }
-        } catch (MQException e) {
-            logger.error("Fail to close queue manger connection " + e);
-        }
     }
 
     /**
@@ -192,7 +164,6 @@ public class IBMMQConnectionUtils {
         msgComp.add(new Integer(CMQXC.MQCOMPRESS_RLE));
         msgComp.add(new Integer(CMQXC.MQCOMPRESS_ZLIBHIGH));
         mqEnvironment.put(CMQC.MSG_CMP_LIST, msgComp);
-
         return mqEnvironment;
     }
 
@@ -243,17 +214,38 @@ public class IBMMQConnectionUtils {
     }
 
     /**
-     * This method use to create a pool for connection caching
+     * This method use to create a pool for caching connections
      *
-     * @param config IBMMQConfiguration object to get the values for customized connection pool
+     * @param mqEnvironment MQEnvironment for connection
+     * @param config        IBMMQConfiguration object to get the values for customized connection pool
      * @return MQSimpleConnectionManager object as customized pool
      */
-    private static MQSimpleConnectionManager PoolToken(IBMMQConfiguration config) {
-        MQSimpleConnectionManager customizedPool = new MQSimpleConnectionManager();
-        customizedPool.setActive(MQSimpleConnectionManager.MODE_AUTO);
-        customizedPool.setTimeout(config.getTimeout());
-        customizedPool.setMaxConnections(config.getmaxConnections());
-        customizedPool.setMaxUnusedConnections(config.getmaxnusedConnections());
-        return customizedPool;
+    private static synchronized MQQueueManager ConnectQueueManager(Hashtable mqEnvironment, IBMMQConfiguration config, String message) {
+        String status = "";
+        MQQueueManager[] queueManager = {null};
+        Future<String> manageConnection = Executors.newSingleThreadExecutor().submit(() -> {
+            try {
+                logger.debug("Attempting connection using connection pool");
+                queueManager[0] = new MQQueueManager(config.getqManger(), mqEnvironment);
+                logger.info("Queue manager connection established " + message);
+                return "Connection established";
+            } catch (MQException e) {
+                logger.debug("Connection with IBM MQ not established");
+                return "Connection not established";
+            }
+        });
+        try {
+            status = manageConnection.get(2, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logger.debug(status);
+            manageConnection.cancel(true);
+        } catch (ExecutionException e) {
+            logger.debug(status);
+            manageConnection.cancel(true);
+        } catch (TimeoutException e) {
+            logger.debug(status);
+            manageConnection.cancel(true);
+        }
+        return queueManager[0];
     }
 }

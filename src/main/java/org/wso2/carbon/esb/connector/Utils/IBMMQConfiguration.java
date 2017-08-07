@@ -326,7 +326,7 @@ public class IBMMQConfiguration {
         this.channel = null;
         this.userName = null;
         this.password = null;
-        this.timeout = 3600;
+        this.timeout = 3600000;
         this.maxConnections = 75;
         this.maxUnusedConnections = 50;
         this.sslEnable = false;

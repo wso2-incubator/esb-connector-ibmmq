@@ -15,7 +15,6 @@
    KIND, either express or implied. See the License for the
    specific language governing permissions and limitations
    under the License.-->
-
 <template name="init" onError="fault" xmlns="http://ws.apache.org/ns/synapse">
     <parameter name="username" description="user of the IBM-MQ installation"/>
     <parameter name="password" description="password of the user IBM-MQ installation"/>
@@ -29,7 +28,6 @@
     <parameter name="transportType" description="transport type"/>
     <parameter name="timeout" description="timeout of the pool"/>
     <parameter name="maxconnections" description="maxconnection of the pool"/>
-    <parameter name="maxunusedconnections" description="max unused connections of the pool"/>
     <parameter name="ciphersuit" description="ciphersuit for the ssl connection"/>
     <parameter name="fipsRequired" description="fips no/yes"/>
     <parameter name="sslEnable" description="ssl enable yes/no"/>
@@ -59,8 +57,6 @@
         <property expression="$func:transportType" name="uri.var.transportType" scope="default" type="STRING"/>
         <property expression="$func:timeout" name="uri.var.timeout" scope="default" type="STRING"/>
         <property expression="$func:maxconnections" name="uri.var.maxconnections" scope="default" type="STRING"/>
-        <property expression="$func:maxunusedconnections" name="uri.var.maxunusedconnections" scope="default"
-                  type="STRING"/>
         <property expression="$func:ciphersuit" name="uri.var.ciphersuit" scope="default" type="STRING"/>
         <property expression="$func:fipsRequired" name="uri.var.fipsRequired" scope="default" type="STRING"/>
         <property expression="$func:sslEnable" name="uri.var.sslEnable" scope="default" type="STRING"/>
