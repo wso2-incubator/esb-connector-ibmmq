@@ -77,7 +77,6 @@ public class IBMMQPublishQueue extends AbstractConnector {
             log.info("Message successfully placed at " + config.getQueue());
             queue.close();
         } catch (MQException mqe) {
-            log.error("Error occured in putting message to the queue", mqe);
             storeErrorResponseStatus(messageContext, mqe, mqe.reasonCode);
             handleException("Exception in queue", mqe, messageContext);
         } catch (IOException ioe) {
@@ -85,27 +84,21 @@ public class IBMMQPublishQueue extends AbstractConnector {
             storeErrorResponseStatus(messageContext, ioe, ioe.hashCode());
             handleException("Exception in queue", ioe, messageContext);
         } catch (CertificateException ce) {
-            log.error("Certificate error", ce);
             storeErrorResponseStatus(messageContext, ce, ce.hashCode());
             handleException("Certificate error", ce, messageContext);
         } catch (NoSuchAlgorithmException iae) {
-            log.error("Invalid Algorithm", iae);
             storeErrorResponseStatus(messageContext, iae, iae.hashCode());
             handleException("Invalid Algorithm", iae, messageContext);
         } catch (UnrecoverableKeyException uke) {
-            log.error("Key is unrecoverable", uke);
             storeErrorResponseStatus(messageContext, uke, uke.hashCode());
             handleException("Key is unrecoverable", uke, messageContext);
         } catch (KeyStoreException ke) {
-            log.error("KeyStore is not valid", ke);
             storeErrorResponseStatus(messageContext, ke, ke.hashCode());
             handleException("KeyStore is not valid", ke, messageContext);
         } catch (ClassNotFoundException cne) {
-            log.error("Class not found", cne);
             storeErrorResponseStatus(messageContext, cne, cne.hashCode());
             handleException("Class not found", cne, messageContext);
         } catch (KeyManagementException ikme) {
-            log.error("KeyManagement is invalid", ikme);
             storeErrorResponseStatus(messageContext, ikme, ikme.hashCode());
             handleException("KeyManagement is invalid", ikme, messageContext);
         } catch (Exception e) {
