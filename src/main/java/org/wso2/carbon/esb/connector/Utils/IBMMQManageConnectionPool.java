@@ -22,7 +22,7 @@ public class IBMMQManageConnectionPool {
     private static IBMMQManageConnectionPool poolObject = null;
 
     /**
-     * This method returns the global
+     * This method returns the global poolObject
      *
      * @return IBMMQManageConnectionPoolObject
      */
