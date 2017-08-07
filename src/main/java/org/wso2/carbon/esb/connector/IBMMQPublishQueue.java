@@ -80,7 +80,6 @@ public class IBMMQPublishQueue extends AbstractConnector {
             storeErrorResponseStatus(messageContext, mqe, mqe.reasonCode);
             handleException("Exception in queue", mqe, messageContext);
         } catch (IOException ioe) {
-            log.error("Error occured in writing payload to the MQMessage", ioe);
             storeErrorResponseStatus(messageContext, ioe, ioe.hashCode());
             handleException("Exception in queue", ioe, messageContext);
         } catch (CertificateException ce) {
