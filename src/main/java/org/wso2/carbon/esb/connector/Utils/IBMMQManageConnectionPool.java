@@ -115,7 +115,7 @@ public class IBMMQManageConnectionPool {
                 return queueManager;
             }
         }
-        if(logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             logger.debug("Queue manager not available in connection pool");
         }
         return null;

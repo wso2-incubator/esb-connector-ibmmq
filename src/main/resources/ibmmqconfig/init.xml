@@ -44,6 +44,7 @@
     <parameter name="connectionNamelist" description="List of ports and hosts"/>
     <parameter name="reconnectTimeout" description="Timeout for reconnection"/>
     <parameter name="charSet" description="character set of the destination queue"/>
+    <parameter name="producerType" description="publish/subscribe or not"/>
     <sequence>
         <property expression="$func:username" name="uri.var.username" scope="default" type="STRING"/>
         <property expression="$func:password" name="uri.var.password" scope="default" type="STRING"/>
@@ -74,5 +75,6 @@
                   type="STRING"/>
         <property expression="$func:reconnectTimeout" name="uri.var.reconnectTimeout" scope="default" type="STRING"/>
         <property expression="$func:charSet" name="uri.var.charSet" scope="default" type="STRING"/>
+        <property expression="$func:producerType" name="uri.var.producerType" scope="default" type="STRING"/>
     </sequence>
 </template>

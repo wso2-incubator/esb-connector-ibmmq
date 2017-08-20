@@ -19,6 +19,7 @@ package org.wso2.carbon.esb.connector;
 
 import com.ibm.mq.MQException;
 import com.ibm.mq.MQMessage;
+import com.ibm.mq.MQQueue;
 import com.ibm.mq.MQQueueManager;
 import com.ibm.mq.MQTopic;
 import com.ibm.mq.constants.CMQC;
@@ -48,7 +49,8 @@ import static org.wso2.carbon.esb.connector.Utils.IBMMQConnectionUtils.getQueueM
 /**
  * Add messages to queue
  */
-public class IBMMQPublishTopic extends AbstractConnector {
+public class IBMMQProducer extends AbstractConnector {
+
     /**
      * Connect method which is generating authentication of the connector for each request.
      *
@@ -65,13 +67,24 @@ public class IBMMQPublishTopic extends AbstractConnector {
         //get queue manager parameters from message context and initialize a connection with IBM WebSphere MQ
         HashMap<String, String> properties = (HashMap<String, String>) new IBMMQPropertyUtils().getProperties(messageContext);
         IBMMQConfiguration config = new IBMMQConfiguration(properties);
+
+        //initialize the queue and put the message in queue
         try {
             MQQueueManager queueManager = getQueueManager(config);
-            MQTopic publisher = queueManager.accessTopic(config.getTopicString(), config.getTopicName(),
-                    CMQC.MQTOPIC_OPEN_AS_PUBLICATION, CMQC.MQOO_OUTPUT);
-            MQMessage mqMessage = buildMQmessage(config, queueMessage);
-            publisher.put(mqMessage);
-            publisher.close();
+            if (config.getProducerType().equals("queue")) {
+                MQQueue queue = queueManager.accessQueue(config.getQueue(), CMQC.MQOO_OUTPUT);
+                MQMessage mqMessage = buildMQmessage(config, queueMessage);
+                queue.put(mqMessage);
+                queue.close();
+                log.info("Message successfully placed at " + config.getQueue());
+            } else {
+                MQTopic publisher = queueManager.accessTopic(config.getTopicString(), config.getTopicName(),
+                        CMQC.MQTOPIC_OPEN_AS_PUBLICATION, CMQC.MQOO_OUTPUT);
+                MQMessage mqMessage = buildMQmessage(config, queueMessage);
+                publisher.put(mqMessage);
+                publisher.close();
+                log.info("Message successfully placed at " + config.getTopicName());
+            }
         } catch (MQException mqe) {
             storeErrorResponseStatus(messageContext, mqe, mqe.reasonCode);
             handleException("Exception in queue", mqe, messageContext);
@@ -97,6 +110,7 @@ public class IBMMQPublishTopic extends AbstractConnector {
             storeErrorResponseStatus(messageContext, ikme, ikme.hashCode());
             handleException("KeyManagement is invalid", ikme, messageContext);
         } catch (Exception e) {
+            log.error("Error occured in connector", e);
             throw new ConnectException(e);
         }
     }
@@ -111,36 +125,26 @@ public class IBMMQPublishTopic extends AbstractConnector {
     private MQMessage buildMQmessage(IBMMQConfiguration config, String queueMessage) throws IOException {
 
         MQMessage mqMessage = new MQMessage();
-        //assigning message ID and correlation ID for the message
         mqMessage.messageId = config.getMessageID().getBytes();
         mqMessage.correlationId = config.getCorrelationID().getBytes();
-        log.info("Correlation ID " + config.getCorrelationID());
-        log.info("Message ID " + config.getMessageID());
-        //setting up message priority attribute
+        mqMessage.messageType = config.getMessageType();
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(new Date(System.currentTimeMillis()));
+        mqMessage.putDateTime = cal;
         if (config.getPriority() != -1000) {
             mqMessage.priority = config.getPriority();
         }
-        //setting up charset attribute
         if (config.getCharSet() > 0) {
             mqMessage.encoding = config.getCharSet();
         }
-        //setting up message type MQMT_DATAGRAM,MQMT_REPLY,MQMT_REPORT and MQMT_REQUEST
-        mqMessage.messageType = config.getMessageType();
-        //setting up persistent attribute
         if (config.isPersistent()) {
             mqMessage.persistence = MQPER_PERSISTENT;
         } else {
             mqMessage.persistence = MQPER_NOT_PERSISTENT;
         }
-        //setting up group ID for the message
         if (config.getgroupID() != null) {
             mqMessage.groupId = config.getgroupID().getBytes();
         }
-        //setting up time stamp for the message
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTime(new Date(System.currentTimeMillis()));
-        mqMessage.putDateTime = cal;
-        //setting up message payload
         mqMessage.writeString(queueMessage);
         return mqMessage;
     }

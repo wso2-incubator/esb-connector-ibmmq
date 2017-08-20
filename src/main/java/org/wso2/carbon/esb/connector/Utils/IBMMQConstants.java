@@ -189,6 +189,11 @@ public class IBMMQConstants {
     public static final String CHARACTER_SET = "uri.var.charSet";
 
     /**
+     * whether the producer is publishing messages to a queue or a topic
+     */
+    public static final String PRODUCER_TYPE = "uri.var.producerType";
+
+    /**
      * Integer constant to identify the message priority and charset
      */
     public static final int INTEGER_CONST = -1;

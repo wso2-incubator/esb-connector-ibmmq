@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import static com.ibm.mq.constants.CMQC.MQMT_DATAGRAM;
 
@@ -183,6 +182,11 @@ public class IBMMQConfiguration {
     private int charSet;
 
     /**
+     * whether the producer is publishing messages to a queue or a topic
+     */
+    private String producerType;
+
+    /**
      * IBMMQConfiguration constructor for get the configuration parameters from
      * message context
      *
@@ -293,6 +297,10 @@ public class IBMMQConfiguration {
             this.queue = properties.get(IBMMQConstants.QUEUE);
         }
 
+        if (properties.get(IBMMQConstants.PRODUCER_TYPE) != null) {
+            this.producerType = properties.get(IBMMQConstants.PRODUCER_TYPE);
+        }
+
         if (properties.get(IBMMQConstants.CHANNEL) != null) {
             this.channel = properties.get(IBMMQConstants.CHANNEL);
         }
@@ -327,8 +335,8 @@ public class IBMMQConfiguration {
         this.trustPassword = "wso2carbon";
         this.keyStore = "wso2carbon.jks";
         this.keyPassword = "wso2carbon";
-        this.messageID = UUID.randomUUID().toString();
-        this.correlationID = UUID.randomUUID().toString();
+        this.messageID = null;
+        this.correlationID = null;
         this.groupID = null;
         this.messageType = MQMT_DATAGRAM;
         this.persistent = false;
@@ -338,6 +346,7 @@ public class IBMMQConfiguration {
         this.topicName = null;
         this.topicString = null;
         this.charSet = IBMMQConstants.INTEGER_CONST;
+        this.producerType = "queue";
     }
 
     /**
@@ -485,6 +494,13 @@ public class IBMMQConfiguration {
      */
     public String getCorrelationID() {
         return correlationID;
+    }
+
+    /**
+     * @return variable producerType.
+     */
+    public String getProducerType() {
+        return producerType;
     }
 
     /**

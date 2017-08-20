@@ -19,7 +19,6 @@ package org.wso2.carbon.esb.connector.Utils;
 
 import com.ibm.mq.MQException;
 import com.ibm.mq.MQQueueManager;
-import com.ibm.mq.MQSimpleConnectionManager;
 import com.ibm.mq.constants.CMQC;
 import com.ibm.mq.constants.CMQXC;
 import com.ibm.mq.constants.MQConstants;
@@ -38,10 +37,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;

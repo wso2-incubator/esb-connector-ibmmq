@@ -14,13 +14,10 @@
    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
    KIND, either express or implied. See the License for the
    specific language governing permissions and limitations
-   under the License.
--->
-<component name="publishqueue" type="synapse/template">
-    <subComponents>
-        <component name="queue">
-            <file>queue.xml</file>
-            <description>send message to IBM MQ</description>
-        </component>
-    </subComponents>
-</component>
+   under the License.-->
+
+<template name="producer" onError="fault" xmlns="http://ws.apache.org/ns/synapse">
+    <sequence>
+        <class name="org.wso2.carbon.esb.connector.IBMMQProducer"/>
+    </sequence>
+</template>

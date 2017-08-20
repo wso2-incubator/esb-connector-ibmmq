@@ -19,8 +19,7 @@
 <connector>
     <component name="ibmmq" package="org.wso2.carbon.connector">
         <dependency component="ibmmqconfig" description="mq configuration"/>
-        <dependency component="publishqueue" description="publish queue class"/>
-        <dependency component="publishtopic" description="publish topic class"/>
+        <dependency component="publish" description="publish message"/>
         <description>wso2 IBM-MQ connector</description>
     </component>
     <icon>icon/icon.png</icon>
