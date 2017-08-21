@@ -76,6 +76,7 @@ public class IBMMQProducer extends AbstractConnector {
                 MQMessage mqMessage = buildMQmessage(config, queueMessage);
                 queue.put(mqMessage);
                 queue.close();
+                queueManager.disconnect();
                 log.info("Message successfully placed at " + config.getQueue());
             } else {
                 MQTopic publisher = queueManager.accessTopic(config.getTopicString(), config.getTopicName(),
@@ -83,6 +84,7 @@ public class IBMMQProducer extends AbstractConnector {
                 MQMessage mqMessage = buildMQmessage(config, queueMessage);
                 publisher.put(mqMessage);
                 publisher.close();
+                queueManager.disconnect();
                 log.info("Message successfully placed at " + config.getTopicName());
             }
         } catch (MQException mqe) {

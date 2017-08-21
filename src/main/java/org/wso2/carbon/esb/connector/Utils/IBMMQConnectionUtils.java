@@ -19,6 +19,7 @@ package org.wso2.carbon.esb.connector.Utils;
 
 import com.ibm.mq.MQException;
 import com.ibm.mq.MQQueueManager;
+import com.ibm.mq.MQSimpleConnectionManager;
 import com.ibm.mq.constants.CMQC;
 import com.ibm.mq.constants.CMQXC;
 import com.ibm.mq.constants.MQConstants;
@@ -37,8 +38,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
@@ -53,6 +56,7 @@ import java.util.concurrent.TimeoutException;
 public class IBMMQConnectionUtils {
 
     private static final Log logger = LogFactory.getLog(IBMMQConnectionUtils.class);
+    private static Map<String, Object[]> connectionPool = new HashMap<>();
 
     /**
      * This method use to get a queue manager specified by the parameters in IBMMQConfiguration.class.
@@ -71,21 +75,45 @@ public class IBMMQConnectionUtils {
      *                                   exceptions produced by failed or interrupted I/O operations.
      * @throws UnrecoverableKeyException This is the exception for invalid Keys (invalid encoding, wrong length,
      *                                   uninitialized, etc).
+     * @throws MQException               This exception indicates a error initializing queue manager
      */
-    public static MQQueueManager getQueueManager(IBMMQConfiguration config) throws ClassNotFoundException,
+    public synchronized static MQQueueManager getQueueManager(IBMMQConfiguration config) throws ClassNotFoundException,
             KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
             UnrecoverableKeyException,
-            KeyManagementException {
+            KeyManagementException, MQException {
 
-        //Setting up environment for MQQueueManager connection
-        Hashtable mqEnvironment = getMQEnvironment(config);
-        IBMMQManageConnectionPool poolObject = IBMMQManageConnectionPool.getInstance();
-
-        //try the connection using connection pool
-        MQQueueManager queueManager = poolObject.PooledQueueManager(config);
-
-        //if the connection pool doesn't have a pooled connection
-        if (queueManager == null) {
+        MQQueueManager queueManager = null;
+        String key = config.getTimeout() + "" + config.getMaxConnections() + "" + config.getMaxUnusedConnections();
+        if (connectionPool.containsKey(key)) {
+            Object[] info = connectionPool.get(key);
+            Hashtable properties = (Hashtable) info[0];
+            if ((properties.get(CMQC.SSL_CIPHER_SUITE_PROPERTY) + "").equals(config.getCipherSuit() + "")) {
+                queueManager = new MQQueueManager(config.getqManger(), (Hashtable) info[0], (MQSimpleConnectionManager) info[1]);
+            } else {
+                Hashtable mqEnvironment = getMQEnvironment(config);
+                MQSimpleConnectionManager connectionManager = getConnectionPool(config);
+                List<String> reconnectList = config.getReconnectList();
+                reconnectList.add(config.getHost() + "/" + config.getPort());
+                long start = System.currentTimeMillis();
+                long end = start + config.getReconnectTimeout();
+                A:
+                while (System.currentTimeMillis() < end) {
+                    for (String conList : reconnectList) {
+                        String[] conArray = conList.split("/");
+                        mqEnvironment.put(MQConstants.HOST_NAME_PROPERTY, conArray[0]);
+                        mqEnvironment.put(MQConstants.PORT_PROPERTY, Integer.valueOf(conArray[1]));
+                        queueManager = ConnectQueueManager(mqEnvironment, config, conArray[0] + " " + conArray[1] + " " + config.getChannel(), connectionManager);
+                        if (queueManager != null) {
+                            Object[] configuration = {mqEnvironment, connectionManager};
+                            connectionPool.put(key, configuration);
+                            break A;
+                        }
+                    }
+                }
+            }
+        } else {
+            Hashtable mqEnvironment = getMQEnvironment(config);
+            MQSimpleConnectionManager connectionManager = getConnectionPool(config);
             List<String> reconnectList = config.getReconnectList();
             reconnectList.add(config.getHost() + "/" + config.getPort());
             long start = System.currentTimeMillis();
@@ -96,9 +124,10 @@ public class IBMMQConnectionUtils {
                     String[] conArray = conList.split("/");
                     mqEnvironment.put(MQConstants.HOST_NAME_PROPERTY, conArray[0]);
                     mqEnvironment.put(MQConstants.PORT_PROPERTY, Integer.valueOf(conArray[1]));
-                    queueManager = ConnectQueueManager(mqEnvironment, config, conArray[0] + " " + conArray[1] + " " + config.getChannel());
+                    queueManager = ConnectQueueManager(mqEnvironment, config, conArray[0] + " " + conArray[1] + " " + config.getChannel(), connectionManager);
                     if (queueManager != null) {
-                        poolObject.InsertNewConnection(queueManager, config);
+                        Object[] configuration = {mqEnvironment, connectionManager};
+                        connectionPool.put(key, configuration);
                         break A;
                     }
                 }
@@ -111,7 +140,7 @@ public class IBMMQConnectionUtils {
     }
 
     /**
-     * This method use to create a HashTable including IBMMQConfiguration parameters.
+     * This method uses to create a HashTable including IBMMQConfiguration parameters.
      *
      * @param config IBMMQConfiguration for create HashTable
      * @return A hashmap containing configuration details for IBM WebSphere MQ.
@@ -133,17 +162,15 @@ public class IBMMQConnectionUtils {
             UnrecoverableKeyException, KeyManagementException {
 
         Hashtable mqEnvironment = new Hashtable();
-        //configurations for ssl
         if (config.isSslEnable()) {
-            if (config.getCiphersuit().contains("TLS")) {
+            if (config.getCipherSuit().contains("TLS")) {
                 Properties props = System.getProperties();
                 props.setProperty("com.ibm.mq.cfg.useIBMCipherMappings", "false");
             }
-            mqEnvironment.put(CMQC.SSL_CIPHER_SUITE_PROPERTY, config.getCiphersuit());
+            mqEnvironment.put(CMQC.SSL_CIPHER_SUITE_PROPERTY, config.getCipherSuit());
             mqEnvironment.put(CMQC.SSL_SOCKET_FACTORY_PROPERTY, createSSLContext(config).getSocketFactory());
             mqEnvironment.put(CMQC.SSL_FIPS_REQUIRED_PROPERTY, config.getFipsRequired());
         }
-
         //set up general configurations
         mqEnvironment.put(CMQC.TRANSPORT_PROPERTY, MQConstants.TRANSPORT_MQSERIES_CLIENT);
         mqEnvironment.put(CMQC.USER_ID_PROPERTY, config.getUserName());
@@ -161,6 +188,21 @@ public class IBMMQConnectionUtils {
         msgComp.add(new Integer(CMQXC.MQCOMPRESS_ZLIBHIGH));
         mqEnvironment.put(CMQC.MSG_CMP_LIST, msgComp);
         return mqEnvironment;
+    }
+
+    private static Hashtable getEnvData(IBMMQConfiguration config) {
+
+        Hashtable env = new Hashtable();
+        if (config.isSslEnable()) {
+            env.put(CMQC.SSL_CIPHER_SUITE_PROPERTY, config.getCipherSuit());
+            env.put(CMQC.SSL_FIPS_REQUIRED_PROPERTY, config.getFipsRequired());
+        }
+        env.put(CMQC.USER_ID_PROPERTY, config.getUserName());
+        env.put(CMQC.PASSWORD_PROPERTY, config.getPassword());
+        env.put(CMQC.CHANNEL_PROPERTY, config.getChannel());
+        env.put(MQConstants.HOST_NAME_PROPERTY, config.getHost());
+        env.put(MQConstants.PORT_PROPERTY, config.getPort());
+        return env;
     }
 
     /**
@@ -205,23 +247,22 @@ public class IBMMQConnectionUtils {
 
         sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
                 null);
-
         return sslContext;
     }
 
     /**
-     * This method use to create a pool for caching connections
+     * This method use to create a connection with queue manager
      *
      * @param mqEnvironment MQEnvironment for connection
      * @param config        IBMMQConfiguration object to get the values for customized connection pool
-     * @return MQSimpleConnectionManager object as customized pool
+     * @return MQQueueManager object as queue manager
      */
-    private static synchronized MQQueueManager ConnectQueueManager(Hashtable mqEnvironment, IBMMQConfiguration config, String message) {
+    private static synchronized MQQueueManager ConnectQueueManager(Hashtable mqEnvironment, IBMMQConfiguration config, String message, MQSimpleConnectionManager connectionManager) {
         String status = "";
         MQQueueManager[] queueManager = {null};
         Future<String> manageConnection = Executors.newSingleThreadExecutor().submit(() -> {
             try {
-                queueManager[0] = new MQQueueManager(config.getqManger(), mqEnvironment);
+                queueManager[0] = new MQQueueManager(config.getqManger(), mqEnvironment, connectionManager);
                 logger.info("Queue manager connection established " + message);
                 return "Connection established";
             } catch (MQException e) {
@@ -250,5 +291,20 @@ public class IBMMQConnectionUtils {
             manageConnection.cancel(true);
         }
         return queueManager[0];
+    }
+
+    /**
+     * This method use to create a pool for connection caching
+     *
+     * @param config IBMMQConfiguration object to get the values for customized connection pool
+     * @return MQSimpleConnectionManager object as customized pool
+     */
+    private static MQSimpleConnectionManager getConnectionPool(IBMMQConfiguration config) {
+        MQSimpleConnectionManager customizedPool = new MQSimpleConnectionManager();
+        customizedPool.setActive(MQSimpleConnectionManager.MODE_ACTIVE);
+        customizedPool.setTimeout(config.getTimeout());
+        customizedPool.setMaxConnections(config.getMaxConnections());
+        customizedPool.setMaxUnusedConnections(config.getMaxUnusedConnections());
+        return customizedPool;
     }
 }

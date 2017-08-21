@@ -352,14 +352,14 @@ public class IBMMQConfiguration {
     /**
      * @return variable maxConnections.
      */
-    public int getmaxConnections() {
+    public int getMaxConnections() {
         return maxConnections;
     }
 
     /**
      * @return variable maxUnusedConnections.
      */
-    public int getmaxnusedConnections() {
+    public int getMaxUnusedConnections() {
         return maxUnusedConnections;
     }
 
@@ -373,7 +373,7 @@ public class IBMMQConfiguration {
     /**
      * @return variable ciphersuit.
      */
-    public String getCiphersuit() {
+    public String getCipherSuit() {
         return ciphersuit;
     }
 
