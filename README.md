@@ -48,7 +48,7 @@ TLS_RSA_WITH_AES_256_CBC_SHA256  | TLS_RSA_WITH_AES_256_CBC_SHA256 |False
 12. sslenabled - whether or not the ssl connection is needed or not (true/false)
 13. ciphersuit - cipher suit specification for ibm mq connections.For further understanding refer [here](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q031290_.htm)Note that IBM MQ versions below 8.0.0.3 does not support many cipher specs.Update the IBM MQ using fix packs as mentioned in [this](http://www-01.ibm.com/support/docview.wss?uid=swg27006037) tutorial. 
 14. trustStore - wso2carbon.jks
-15. trustpassword - wso2carbon
+15. trustPassword - wso2carbon
 16. keyStore - wso2carbon.jks
 17. keyPassword - wso2carbon
 18. [correlationID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-The CorrelationId to be included in the MQMD of a message when put on a queue. Also the ID to be matched against when getting a message from a queue.
@@ -56,10 +56,6 @@ TLS_RSA_WITH_AES_256_CBC_SHA256  | TLS_RSA_WITH_AES_256_CBC_SHA256 |False
 20. [groupID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-This is a byte string that is used to identify the particular message group or logical message to which the physical message belongs.
 21. connectionNamelist - Reconnection parameters in case of connection failure.Add the list of hosts and ports here to connector to retry for the connections.
 22. reconnectionTimeout - Reconnection parameters in case of connection failure .Add reconnection timeout for the reconnection.
-
-#### Basic flow chart of the connector operation
-
-![finaldiagram](https://user-images.githubusercontent.com/11781930/28656285-ab6723aa-72be-11e7-81b4-fa5d66f8ac51.png)
 
 #### Sample proxy service without ssl
 ```
@@ -80,6 +76,7 @@ TLS_RSA_WITH_AES_256_CBC_SHA256  | TLS_RSA_WITH_AES_256_CBC_SHA256 |False
                 <qmanager>qmanager</qmanager>
                 <channel>PASSWORD.SVRCONN</channel>
                 <queue>myqueue</queue>
+                <producerType>queue</producerType>
                 <connectionNamelist>12.0.0.1/1414,127.0.0.1/1414</connectionNamelist>
                 <reconnectTimeout>10000</reconnectTimeout>
                 <messageType>8(MQMT_DATAGRAM see the parameter description)</messageType>
@@ -92,7 +89,7 @@ TLS_RSA_WITH_AES_256_CBC_SHA256  | TLS_RSA_WITH_AES_256_CBC_SHA256 |False
                 <groupID>GroupID@IBMMQ123</groupID>
                 <sslEnable>false</sslEnable>
             </ibmmq.init>
-            <ibmmq.queue/>
+            <ibmmq.producer/>
         </inSequence>
     </target>
     <description/>
@@ -119,6 +116,7 @@ TLS_RSA_WITH_AES_256_CBC_SHA256  | TLS_RSA_WITH_AES_256_CBC_SHA256 |False
                 <qmanager>qmanager</qmanager>
                 <channel>PASSWORD.SVRCONN</channel>
                 <queue>myqueue</queue>
+                <producerType>queue</producerType>
                 <connectionNamelist>12.0.0.1/1414,127.0.0.1/1414</connectionNamelist>
                 <reconnectTimeout>10000</reconnectTimeout>
                 <messageType>8(MQMT_DATAGRAM see the parameter description)</messageType>
@@ -137,9 +135,51 @@ TLS_RSA_WITH_AES_256_CBC_SHA256  | TLS_RSA_WITH_AES_256_CBC_SHA256 |False
                 <keyStore>wso2carbon.jks</keyStore>
                 <keyPassword>wso2carbon</keyPassword>
             </ibmmq.init>
-            <ibmmq.queue/>
+            <ibmmq.producer/>
         </inSequence>
     </target>
     <description/>
+</proxy>
+```
+#### Sample proxy service with ssl for topic
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<proxy xmlns="http://ws.apache.org/ns/synapse"
+       name="ibmmqtest"
+       startOnLoad="true"
+       statistics="disable"
+       trace="disable"
+       transports="http,https">
+   <target>
+      <inSequence>
+         <ibmmq.init>
+            <username>mqm</username>
+            <password>upgs5423</password>
+            <port>1414</port>
+            <host>12.0.0.1</host>
+            <qmanager>qmanager</qmanager>
+            <connectionNamelist>12.0.0.1/1414,127.0.0.1/1414</connectionNamelist>
+            <reconnectTimeout>1000</reconnectTimeout>
+            <messageType>8</messageType>
+            <channel>PASSWORD.SVRCONN</channel>
+            <producerType>topic</producerType>
+            <topicname>mytopic</topicname>
+            <topicstring>topic</topicstring>
+            <messageID>MessageID@IBMMQ1234</messageID>
+            <correlationID>CorrelationID@IBMMQ1234</correlationID>
+            <transportType>1</transportType>
+            <timeout>300</timeout>
+            <sslEnable>true</sslEnable>
+            <ciphersuit>TLS_RSA_WITH_AES_128_CBC_SHA</ciphersuit>
+            <flipsRequired>false</flipsRequired>
+            <trustStore>wso2carbon.jks</trustStore>
+            <trustPassword>wso2carbon</trustPassword>
+            <keyStore>wso2carbon.jks</keyStore>
+            <keyPassword>wso2carbon</keyPassword>
+         </ibmmq.init>
+         <ibmmq.producer/>
+      </inSequence>
+   </target>
+   <description/>
 </proxy>
 ```

@@ -28,26 +28,29 @@
                 <username>mqm</username>
                 <password>upgs5423</password>
                 <port>1414</port>
-                <host>127.0.0.1</host>
+                <host>12.0.0.1</host>
                 <qmanager>qmanager</qmanager>
-                <queue>myqueue</queue>
+                <connectionNamelist>12.0.0.1/1414,127.0.0.1/1414</connectionNamelist>
+                <reconnectTimeout>1000</reconnectTimeout>
+                <messageType>8</messageType>
                 <channel>PASSWORD.SVRCONN</channel>
+                <producerType>topic</producerType>
+                <topicname>mytopic</topicname>
+                <topicstring>topic</topicstring>
+                <messageID>MessageID@IBMMQ1234</messageID>
+                <correlationID>CorrelationID@IBMMQ1234</correlationID>
                 <transportType>1</transportType>
-                <timeOut>1000</timeOut>
+                <timeout>300</timeout>
                 <sslEnable>true</sslEnable>
-                <ciphersuit>SSL_RSA_WITH_3DES_EDE_CBC_SHA</ciphersuit>
+                <ciphersuit>TLS_RSA_WITH_AES_128_CBC_SHA</ciphersuit>
                 <flipsRequired>false</flipsRequired>
                 <trustStore>wso2carbon.jks</trustStore>
                 <trustPassword>wso2carbon</trustPassword>
                 <keyStore>wso2carbon.jks</keyStore>
                 <keyPassword>wso2carbon</keyPassword>
-                <messageType>MQMT_REPORT</messageType>
-                <replyQueue>result</replyQueue>
             </ibmmq.init>
-            <ibmmq.queue/>
-            <log level="full"/>
+            <ibmmq.producer/>
         </inSequence>
     </target>
     <description/>
 </proxy>
-
