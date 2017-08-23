@@ -190,21 +190,6 @@ public class IBMMQConnectionUtils {
         return mqEnvironment;
     }
 
-    private static Hashtable getEnvData(IBMMQConfiguration config) {
-
-        Hashtable env = new Hashtable();
-        if (config.isSslEnable()) {
-            env.put(CMQC.SSL_CIPHER_SUITE_PROPERTY, config.getCipherSuit());
-            env.put(CMQC.SSL_FIPS_REQUIRED_PROPERTY, config.getFipsRequired());
-        }
-        env.put(CMQC.USER_ID_PROPERTY, config.getUserName());
-        env.put(CMQC.PASSWORD_PROPERTY, config.getPassword());
-        env.put(CMQC.CHANNEL_PROPERTY, config.getChannel());
-        env.put(MQConstants.HOST_NAME_PROPERTY, config.getHost());
-        env.put(MQConstants.PORT_PROPERTY, config.getPort());
-        return env;
-    }
-
     /**
      * This method use to create a SSLContext for ssl connections
      *
@@ -257,7 +242,7 @@ public class IBMMQConnectionUtils {
      * @param config        IBMMQConfiguration object to get the values for customized connection pool
      * @return MQQueueManager object as queue manager
      */
-    private static synchronized MQQueueManager ConnectQueueManager(Hashtable mqEnvironment, IBMMQConfiguration config, String message, MQSimpleConnectionManager connectionManager) {
+    private static MQQueueManager ConnectQueueManager(Hashtable mqEnvironment, IBMMQConfiguration config, String message, MQSimpleConnectionManager connectionManager) {
         String status = "";
         MQQueueManager[] queueManager = {null};
         Future<String> manageConnection = Executors.newSingleThreadExecutor().submit(() -> {

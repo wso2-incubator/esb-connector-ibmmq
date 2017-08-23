@@ -325,7 +325,7 @@ public class IBMMQConfiguration {
         this.channel = null;
         this.userName = null;
         this.password = null;
-        this.timeout = 3600000;
+        this.timeout = 3600;
         this.maxConnections = 75;
         this.maxUnusedConnections = 50;
         this.sslEnable = false;
@@ -346,7 +346,7 @@ public class IBMMQConfiguration {
         this.topicName = null;
         this.topicString = null;
         this.charSet = IBMMQConstants.INTEGER_CONST;
-        this.producerType = "queue";
+        this.producerType = null;
     }
 
     /**

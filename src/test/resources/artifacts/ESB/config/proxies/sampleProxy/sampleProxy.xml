@@ -29,20 +29,20 @@
                 <password>upgs5423</password>
                 <port>1414</port>
                 <host>12.0.0.1</host>
-                <qmanager>qmanager</qmanager>
-                <connectionNamelist>12.0.0.1/1414,127.0.0.1/1414</connectionNamelist>
+                <queueManager>qmanager</queueManager>
+                <connectionNameList>12.0.0.1/1414,127.0.0.1/1414</connectionNameList>
                 <reconnectTimeout>1000</reconnectTimeout>
                 <messageType>8</messageType>
                 <channel>PASSWORD.SVRCONN</channel>
                 <producerType>topic</producerType>
-                <topicname>mytopic</topicname>
-                <topicstring>topic</topicstring>
+                <topicName>mytopic</topicName>
+                <topicString>topic</topicString>
                 <messageID>MessageID@IBMMQ1234</messageID>
                 <correlationID>CorrelationID@IBMMQ1234</correlationID>
                 <transportType>1</transportType>
                 <timeout>300</timeout>
                 <sslEnable>true</sslEnable>
-                <ciphersuit>TLS_RSA_WITH_AES_128_CBC_SHA</ciphersuit>
+                <cipherSuite>TLS_RSA_WITH_AES_128_CBC_SHA</cipherSuite>
                 <flipsRequired>false</flipsRequired>
                 <trustStore>wso2carbon.jks</trustStore>
                 <trustPassword>wso2carbon</trustPassword>
