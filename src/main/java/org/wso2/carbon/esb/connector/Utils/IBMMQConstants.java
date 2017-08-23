@@ -154,12 +154,6 @@ public class IBMMQConstants {
     public static final String PERSISTENT = "uri.var.persistent";
 
     /**
-     * The group identifier for messages. The group identifier defines the messages
-     * that belong to a specified group.
-     */
-    public static final String GROUP_ID = "uri.var.groupID";
-
-    /**
      * You can set a numeric value for the priority, or you can let the message
      * take the default priority of the queue.
      */

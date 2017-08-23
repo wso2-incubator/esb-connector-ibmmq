@@ -55,11 +55,10 @@ TLS_RSA_WITH_AES_256_CBC_SHA256  | TLS_RSA_WITH_AES_256_CBC_SHA256 |False
 19. keyPassword - wso2carbon
 20. [correlationID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-The CorrelationId to be included in the MQMD of a message when put on a queue. Also the ID to be matched against when getting a message from a queue.
 21. [messageID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-The MessageId to be included in the MQMD of a message when put on a queue. Also the ID to be matched against when getting a message from a queue.Its initial value is all nulls.
-22. [groupID](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q033280_.htm#q033280___s1)-This is a byte string that is used to identify the particular message group or logical message to which the physical message belongs.
-23. connectionNameList - Reconnection parameters in case of connection failure.Add the list of hosts and ports here to connector to retry for the connections.
-24. reconnectionTimeout - Reconnection parameters in case of connection failure .Add reconnection timeout for the reconnection.
-25. topicName - Name of the topic as initialized in the queue manager.
-26. [topicString](https://www.ibm.com/support/knowledgecenter/SSFKSJ_8.0.0/com.ibm.mq.pro.doc/q005000_.htm) topicString attribute as initialized in the queue manager.
+22. connectionNameList - Reconnection parameters in case of connection failure.Add the list of hosts and ports here to connector to retry for the connections.
+23. reconnectionTimeout - Reconnection parameters in case of connection failure .Add reconnection timeout for the reconnection.
+24. topicName - Name of the topic as initialized in the queue manager.
+25. [topicString](https://www.ibm.com/support/knowledgecenter/SSFKSJ_8.0.0/com.ibm.mq.pro.doc/q005000_.htm) topicString attribute as initialized in the queue manager.
 
 #### Sample proxy service without ssl
 ```

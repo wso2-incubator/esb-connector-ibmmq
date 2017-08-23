@@ -144,9 +144,6 @@ public class IBMMQProducer extends AbstractConnector {
         } else {
             mqMessage.persistence = MQPER_NOT_PERSISTENT;
         }
-        if (config.getgroupID() != null) {
-            mqMessage.groupId = config.getgroupID().getBytes();
-        }
         mqMessage.writeString(queueMessage);
         return mqMessage;
     }

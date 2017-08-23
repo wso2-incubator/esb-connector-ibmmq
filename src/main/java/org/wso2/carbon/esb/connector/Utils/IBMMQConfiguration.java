@@ -131,12 +131,6 @@ public class IBMMQConfiguration {
     private String correlationID;
 
     /**
-     * The group identifier for messages. The group identifier defines the messages
-     * that belong to a specified group.
-     */
-    private String groupID;
-
-    /**
      * Type of the message from MQMT_DATAGRAM,MQMT_REPLY,MQMT_REQUEST and MQMT_REPORT
      */
     private int messageType;
@@ -273,10 +267,6 @@ public class IBMMQConfiguration {
             this.correlationID = properties.get(IBMMQConstants.CORRELATION_ID);
         }
 
-        if (properties.get(IBMMQConstants.GROUP_ID) != null) {
-            this.groupID = properties.get(IBMMQConstants.GROUP_ID);
-        }
-
         if (properties.get(IBMMQConstants.KEY_STORE) != null) {
             this.keyStore = System.getProperty("user.dir") + "/repository/resources/security/" + properties.get(IBMMQConstants.KEY_STORE);
         }
@@ -337,7 +327,6 @@ public class IBMMQConfiguration {
         this.keyPassword = "wso2carbon";
         this.messageID = null;
         this.correlationID = null;
-        this.groupID = null;
         this.messageType = MQMT_DATAGRAM;
         this.persistent = false;
         this.priority = IBMMQConstants.INTEGER_CONST;
@@ -501,13 +490,6 @@ public class IBMMQConfiguration {
      */
     public String getProducerType() {
         return producerType;
-    }
-
-    /**
-     * @return variable groupID.
-     */
-    public String getgroupID() {
-        return groupID;
     }
 
     /**
