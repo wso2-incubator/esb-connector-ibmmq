@@ -83,7 +83,7 @@ public class IBMMQConnectionUtils {
             KeyManagementException, MQException {
 
         MQQueueManager queueManager = null;
-        String key = config.getTimeout() + "" + config.getMaxConnections() + "" + config.getMaxUnusedConnections();
+        String key = config.getTimeout() + "" + config.getMaxConnections() + "" + config.getMaxUnusedConnections()+""+config.getqManger();
         if (connectionPool.containsKey(key)) {
             Object[] info = connectionPool.get(key);
             Hashtable properties = (Hashtable) info[0];
