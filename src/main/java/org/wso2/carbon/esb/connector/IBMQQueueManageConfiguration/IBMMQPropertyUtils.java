@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.esb.connector.Utils;
+package org.wso2.carbon.esb.connector.IBMQQueueManageConfiguration;
 
 import org.apache.synapse.MessageContext;
 
@@ -33,10 +33,10 @@ public class IBMMQPropertyUtils {
      * sorted by expected API parameter names.
      *
      * @param msgCtx ESB messageContext.
-     * @return A hashmap containing configuration details for IBM WebSphere MQ.If the the
+     * @return A hash map containing configuration details for IBM WebSphere MQ.If the the
      * required fields are not assigned by the client default fields will be assigned
      */
-    public Map<String, String> getProperties(MessageContext msgCtx) {
+    public static Map<String, String> getProperties(MessageContext msgCtx) {
         Map<String, String> properties = new HashMap<>();
         Set<String> set = msgCtx.getPropertyKeySet();
         for (String s : set) {

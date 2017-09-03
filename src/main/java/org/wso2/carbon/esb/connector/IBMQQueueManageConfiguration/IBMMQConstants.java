@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.esb.connector.Utils;
+package org.wso2.carbon.esb.connector.IBMQQueueManageConfiguration;
 
 /**
  * IBM MQ constants
@@ -80,7 +80,7 @@ public class IBMMQConstants {
     /**
      * Name of the queue manager
      */
-    public static final String QMANAGER = "uri.var.queueMmanager";
+    public static final String QUEUE_MANAGER = "uri.var.queueManager";
 
     /**
      * Name of the queue which the messages need to be placed
@@ -92,11 +92,6 @@ public class IBMMQConstants {
      * sent from the connector to the remote queue manager.
      */
     public static final String CHANNEL = "uri.var.channel";
-
-    /**
-     * Whether to use a local binding or client/server TCP binding
-     */
-    public static final String TRANSPORT_TYPE = "uri.var.transportType";
 
     /**
      * cipher suit specification for ibm mq connections.Note that IBM MQ versions
@@ -116,26 +111,6 @@ public class IBMMQConstants {
      * whether or not the ssl connection is needed or not (true/false)
      */
     public static final String SSL_ENABLE = "uri.var.sslEnable";
-
-    /**
-     * Name of the truststore.Use the wso2 keystore after importing the certificates.
-     */
-    public static final String TRUST_STORE = "uri.var.trustStore";
-
-    /**
-     * truststore password
-     */
-    public static final String TRUST_PASSWORD = "uri.var.trustPassword";
-
-    /**
-     * Name of the keystore.Use the wso2 keystore after importing the certificates.
-     */
-    public static final String KEY_STORE = "uri.var.keyStore";
-
-    /**
-     * keystore password
-     */
-    public static final String KEY_PASSWORD = "uri.var.keyPassword";
 
     /**
      * Use the properties in this group to specify the message identifier for messages.
@@ -183,12 +158,17 @@ public class IBMMQConstants {
     public static final String CHARACTER_SET = "uri.var.charSet";
 
     /**
-     * whether the producer is publishing messages to a queue or a topic
-     */
-    public static final String PRODUCER_TYPE = "uri.var.producerType";
-
-    /**
      * Integer constant to identify the message priority and charset
      */
     public static final int INTEGER_CONST = -1;
+
+    /**
+     * The name of the queue to which a reply should be sent.
+     */
+    public static final String REPLY_TO_QUEUE = "uri.var.replyToQueueName";
+
+    /**
+     * The name of the queue manager to which reply or report messages should be sent.
+     */
+    public static final String REPLY_TO_QUEUE_MANAGER = "uri.var.replyToQueueManagerName";
 }

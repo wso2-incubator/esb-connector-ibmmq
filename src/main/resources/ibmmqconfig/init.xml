@@ -28,14 +28,11 @@
     <parameter name="transportType" description="transport type"/>
     <parameter name="timeout" description="timeout of the pool"/>
     <parameter name="maxConnections" description="maximum connection that the connection pool can handle"/>
-    <parameter name="maxUnusedConnections" description="maximum unused connections that the connection pool can handle"/>
+    <parameter name="maxUnusedConnections"
+               description="maximum unused connections that the connection pool can handle"/>
     <parameter name="cipherSuite" description="ciphersuit for the ssl connection"/>
     <parameter name="fipsRequired" description="fips no/yes"/>
     <parameter name="sslEnable" description="ssl enable yes/no"/>
-    <parameter name="trustStore" description="path of the trustStore"/>
-    <parameter name="trustPassword" description="password of the truststore"/>
-    <parameter name="keyStore" description="password of the keyStore"/>
-    <parameter name="keyPassword" description="password of the keyStore"/>
     <parameter name="messageID" description="message id"/>
     <parameter name="correlationID" description="correlation id"/>
     <parameter name="groupID" description="group id"/>
@@ -45,7 +42,9 @@
     <parameter name="connectionNameList" description="List of ports and hosts"/>
     <parameter name="reconnectTimeout" description="Timeout for reconnection"/>
     <parameter name="charSet" description="character set of the destination queue"/>
-    <parameter name="producerType" description="publish/subscribe or not"/>
+    <parameter name="replyToQueueName" description="The name of the queue to which a reply should be sent."/>
+    <parameter name="replyToQueueManagerName"
+               description="The name of the queue manager to which a reply should be sent."/>
     <sequence>
         <property expression="$func:username" name="uri.var.username" scope="default" type="STRING"/>
         <property expression="$func:password" name="uri.var.password" scope="default" type="STRING"/>
@@ -59,14 +58,11 @@
         <property expression="$func:transportType" name="uri.var.transportType" scope="default" type="STRING"/>
         <property expression="$func:timeout" name="uri.var.timeout" scope="default" type="STRING"/>
         <property expression="$func:maxConnections" name="uri.var.maxConnections" scope="default" type="STRING"/>
-        <property expression="$func:maxUnusedConnections" name="uri.var.maxUnusedConnections" scope="default" type="STRING"/>
+        <property expression="$func:maxUnusedConnections" name="uri.var.maxUnusedConnections" scope="default"
+                  type="STRING"/>
         <property expression="$func:cipherSuite" name="uri.var.cipherSuite" scope="default" type="STRING"/>
         <property expression="$func:fipsRequired" name="uri.var.fipsRequired" scope="default" type="STRING"/>
         <property expression="$func:sslEnable" name="uri.var.sslEnable" scope="default" type="STRING"/>
-        <property expression="$func:trustStore" name="uri.var.trustStore" scope="default" type="STRING"/>
-        <property expression="$func:trustPassword" name="uri.var.trustPassword" scope="default" type="STRING"/>
-        <property expression="$func:keyStore" name="uri.var.keyStore" scope="default" type="STRING"/>
-        <property expression="$func:keyPassword" name="uri.var.keyPassword" scope="default" type="STRING"/>
         <property expression="$func:correlationID" name="uri.var.correlationID" scope="default" type="STRING"/>
         <property expression="$func:messageID" name="uri.var.messageID" scope="default" type="STRING"/>
         <property expression="$func:groupID" name="uri.var.groupID" scope="default" type="STRING"/>
@@ -77,6 +73,8 @@
                   type="STRING"/>
         <property expression="$func:reconnectTimeout" name="uri.var.reconnectTimeout" scope="default" type="STRING"/>
         <property expression="$func:charSet" name="uri.var.charSet" scope="default" type="STRING"/>
-        <property expression="$func:producerType" name="uri.var.producerType" scope="default" type="STRING"/>
+        <property expression="$func:replyToQueueName" name="uri.var.replyToQueueName" scope="default" type="STRING"/>
+        <property expression="$func:replyToQueueManagerName" name="uri.var.replyToQueueManagerName" scope="default"
+                  type="STRING"/>
     </sequence>
 </template>

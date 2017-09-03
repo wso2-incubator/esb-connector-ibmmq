@@ -15,12 +15,12 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.esb.connector.Utils;
+package org.wso2.carbon.esb.connector.IBMQQueueManageConfiguration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.ibm.mq.constants.CMQC.MQMT_DATAGRAM;
 
@@ -42,7 +42,7 @@ public class IBMMQConfiguration {
     /**
      * Name of the queue manager
      */
-    private String qManger;
+    private String queueManager;
 
     /**
      * Name of the queue which the messages need to be placed
@@ -93,32 +93,12 @@ public class IBMMQConfiguration {
      * cipher suit specification for ibm mq connections.Note that IBM MQ versions
      * below 8.0.0.3 does not support many cipher specs.Update the IBM MQ using fix packs.
      */
-    private String ciphersuit;
+    private String cipherSuite;
 
     /**
      * Specify whether you want to enable FIPS support for an agent
      */
     private boolean fipsRequired;
-
-    /**
-     * Name of the truststore.Use the wso2 keystore after importing the certificates.
-     */
-    private String trustStore;
-
-    /**
-     * truststore password
-     */
-    private String trustPassword;
-
-    /**
-     * Name of the keystore.Use the wso2 keystore after importing the certificates.
-     */
-    private String keyStore;
-
-    /**
-     * keystore password
-     */
-    private String keyPassword;
 
     /**
      * Use the properties in this group to specify the message identifier for messages.
@@ -176,9 +156,14 @@ public class IBMMQConfiguration {
     private int charSet;
 
     /**
-     * whether the producer is publishing messages to a queue or a topic
+     * The name of the queue to which a reply should be sent.
      */
-    private String producerType;
+    private String replyToQueueName;
+
+    /**
+     * The name of the queue manager to which a reply should be sent.
+     */
+    private String replyToQueueManager;
 
     /**
      * IBMMQConfiguration constructor for get the configuration parameters from
@@ -186,7 +171,7 @@ public class IBMMQConfiguration {
      *
      * @param properties properties HashMap from IBMMQPropertyUtils
      */
-    public IBMMQConfiguration(HashMap<String, String> properties) {
+    public IBMMQConfiguration(Map<String, String> properties) {
 
         //setting up default values for configuration parameters
         setupdefaultValues();
@@ -200,7 +185,16 @@ public class IBMMQConfiguration {
         }
 
         if (properties.get(IBMMQConstants.MESSAGE_TYPE) != null) {
-            this.messageType = Integer.valueOf(properties.get(IBMMQConstants.MESSAGE_TYPE));
+            String strType = properties.get(IBMMQConstants.MESSAGE_TYPE);
+            if (strType.equals("DATAGRAM")) {
+                this.messageType = 8;
+            } else if (strType.equals("REPLY")) {
+                this.messageType = 2;
+            } else if (strType.equals("REPORT")) {
+                this.messageType = 4;
+            } else if (strType.equals("REQUEST")) {
+                this.messageType = 1;
+            }
         }
 
         if (properties.get(IBMMQConstants.CONNECTION_NAMELIST) != null) {
@@ -236,7 +230,7 @@ public class IBMMQConfiguration {
         }
 
         if (properties.get(IBMMQConstants.CIPHERSUIT) != null) {
-            this.ciphersuit = properties.get(IBMMQConstants.CIPHERSUIT);
+            this.cipherSuite = properties.get(IBMMQConstants.CIPHERSUIT);
         }
 
         if (properties.get(IBMMQConstants.CHARACTER_SET) != null) {
@@ -248,15 +242,10 @@ public class IBMMQConfiguration {
         }
 
         if (properties.get(IBMMQConstants.PERSISTENT) != null) {
-            this.persistent = Boolean.valueOf(properties.get(IBMMQConstants.PERSISTENT));
-        }
+            String perStr = properties.get(IBMMQConstants.PERSISTENT);
+            if(perStr.equals("PERSISTENT")){
 
-        if (properties.get(IBMMQConstants.TRUST_STORE) != null) {
-            this.trustStore = System.getProperty("user.dir") + "/repository/resources/security/" + properties.get(IBMMQConstants.TRUST_STORE);
-        }
-
-        if (properties.get(IBMMQConstants.TRUST_PASSWORD) != null) {
-            this.trustPassword = properties.get(IBMMQConstants.TRUST_PASSWORD);
+            }
         }
 
         if (properties.get(IBMMQConstants.MESSAGE_ID) != null) {
@@ -267,28 +256,16 @@ public class IBMMQConfiguration {
             this.correlationID = properties.get(IBMMQConstants.CORRELATION_ID);
         }
 
-        if (properties.get(IBMMQConstants.KEY_STORE) != null) {
-            this.keyStore = System.getProperty("user.dir") + "/repository/resources/security/" + properties.get(IBMMQConstants.KEY_STORE);
-        }
-
-        if (properties.get(IBMMQConstants.KEY_PASSWORD) != null) {
-            this.keyPassword = properties.get(IBMMQConstants.KEY_PASSWORD);
-        }
-
         if (properties.get(IBMMQConstants.HOST) != null) {
             this.host = properties.get(IBMMQConstants.HOST);
         }
 
-        if (properties.get(IBMMQConstants.QMANAGER) != null) {
-            this.qManger = properties.get(IBMMQConstants.QMANAGER);
+        if (properties.get(IBMMQConstants.QUEUE_MANAGER) != null) {
+            this.queueManager = properties.get(IBMMQConstants.QUEUE_MANAGER);
         }
 
         if (properties.get(IBMMQConstants.QUEUE) != null) {
             this.queue = properties.get(IBMMQConstants.QUEUE);
-        }
-
-        if (properties.get(IBMMQConstants.PRODUCER_TYPE) != null) {
-            this.producerType = properties.get(IBMMQConstants.PRODUCER_TYPE);
         }
 
         if (properties.get(IBMMQConstants.CHANNEL) != null) {
@@ -302,6 +279,14 @@ public class IBMMQConfiguration {
         if (properties.get(IBMMQConstants.PASSWORD) != null) {
             this.password = properties.get(IBMMQConstants.PASSWORD);
         }
+
+        if (properties.get(IBMMQConstants.REPLY_TO_QUEUE) != null) {
+            this.replyToQueueName = properties.get(IBMMQConstants.REPLY_TO_QUEUE);
+        }
+
+        if (properties.get(IBMMQConstants.REPLY_TO_QUEUE_MANAGER) != null) {
+            this.replyToQueueManager = properties.get(IBMMQConstants.REPLY_TO_QUEUE_MANAGER);
+        }
     }
 
     /**
@@ -310,7 +295,7 @@ public class IBMMQConfiguration {
     private void setupdefaultValues() {
         this.port = 1414;
         this.host = "127.0.0.1";
-        this.qManger = null;
+        this.queueManager = null;
         this.queue = null;
         this.channel = null;
         this.userName = null;
@@ -319,12 +304,8 @@ public class IBMMQConfiguration {
         this.maxConnections = 75;
         this.maxUnusedConnections = 50;
         this.sslEnable = false;
-        this.ciphersuit = null;
+        this.cipherSuite = null;
         this.fipsRequired = false;
-        this.trustStore = "wso2carbon.jks";
-        this.trustPassword = "wso2carbon";
-        this.keyStore = "wso2carbon.jks";
-        this.keyPassword = "wso2carbon";
         this.messageID = null;
         this.correlationID = null;
         this.messageType = MQMT_DATAGRAM;
@@ -335,7 +316,8 @@ public class IBMMQConfiguration {
         this.topicName = null;
         this.topicString = null;
         this.charSet = IBMMQConstants.INTEGER_CONST;
-        this.producerType = null;
+        this.replyToQueueName = "";
+        this.replyToQueueManager = "";
     }
 
     /**
@@ -360,10 +342,10 @@ public class IBMMQConfiguration {
     }
 
     /**
-     * @return variable ciphersuit.
+     * @return variable cipherSuite.
      */
     public String getCipherSuit() {
-        return ciphersuit;
+        return cipherSuite;
     }
 
     /**
@@ -378,34 +360,6 @@ public class IBMMQConfiguration {
      */
     public boolean isSslEnable() {
         return sslEnable;
-    }
-
-    /**
-     * @return variable trustStore.
-     */
-    public String getTrustStore() {
-        return trustStore;
-    }
-
-    /**
-     * @return variable trustPassword.
-     */
-    public String getTrustPassword() {
-        return trustPassword;
-    }
-
-    /**
-     * @return variable keyStore.
-     */
-    public String getKeyStore() {
-        return keyStore;
-    }
-
-    /**
-     * @return variable keyPassword.
-     */
-    public String getKeyPassword() {
-        return keyPassword;
     }
 
     /**
@@ -439,8 +393,8 @@ public class IBMMQConfiguration {
     /**
      * @return variable qManager.
      */
-    public String getqManger() {
-        return qManger;
+    public String getQueueManager() {
+        return queueManager;
     }
 
     /**
@@ -486,13 +440,6 @@ public class IBMMQConfiguration {
     }
 
     /**
-     * @return variable producerType.
-     */
-    public String getProducerType() {
-        return producerType;
-    }
-
-    /**
      * @return variable persistent.
      */
     public boolean isPersistent() {
@@ -532,5 +479,19 @@ public class IBMMQConfiguration {
      */
     public int getCharSet() {
         return charSet;
+    }
+
+    /**
+     * @return variable replaytoQueueName.
+     */
+    public String getReplyToQueueName() {
+        return replyToQueueName;
+    }
+
+    /**
+     * @return variable replyToQueueManager.
+     */
+    public String getReplyToQueueManager() {
+        return replyToQueueManager;
     }
 }

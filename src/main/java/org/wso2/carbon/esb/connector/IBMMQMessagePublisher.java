@@ -29,8 +29,8 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
-import org.wso2.carbon.esb.connector.Utils.IBMMQConfiguration;
-import org.wso2.carbon.esb.connector.Utils.IBMMQPropertyUtils;
+import org.wso2.carbon.esb.connector.IBMQQueueManageConfiguration.IBMMQConfiguration;
+import org.wso2.carbon.esb.connector.IBMQQueueManageConfiguration.IBMMQPropertyUtils;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -40,16 +40,16 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
+import java.util.Map;
 
 import static com.ibm.mq.constants.CMQC.MQPER_NOT_PERSISTENT;
 import static com.ibm.mq.constants.CMQC.MQPER_PERSISTENT;
-import static org.wso2.carbon.esb.connector.Utils.IBMMQConnectionUtils.getQueueManager;
+import static org.wso2.carbon.esb.connector.IBMMQQueueManagerInitializer.getQueueManager;
 
 /**
  * Add messages to queue
  */
-public class IBMMQProducer extends AbstractConnector {
+public class IBMMQMessagePublisher extends AbstractConnector {
 
     /**
      * Connect method which is generating authentication of the connector for each request.
@@ -65,26 +65,25 @@ public class IBMMQProducer extends AbstractConnector {
         String queueMessage = getElement.toString();
 
         //get queue manager parameters from message context and initialize a connection with IBM WebSphere MQ
-        HashMap<String, String> properties = (HashMap<String, String>) new IBMMQPropertyUtils().getProperties(messageContext);
+        Map<String, String> properties = IBMMQPropertyUtils.getProperties(messageContext);
         IBMMQConfiguration config = new IBMMQConfiguration(properties);
 
         //initialize the queue and put the message in queue
         try {
             MQQueueManager queueManager = getQueueManager(config);
-            if (config.getProducerType().equals("queue")) {
+            if (config.getQueue() != null) {
                 MQQueue queue = queueManager.accessQueue(config.getQueue(), CMQC.MQOO_OUTPUT);
                 MQMessage mqMessage = buildMQmessage(config, queueMessage);
                 queue.put(mqMessage);
                 queue.close();
-                queueManager.disconnect();
                 log.info("Message successfully placed at " + config.getQueue());
-            } else {
+            }
+            if (config.getTopicName() != null && config.getTopicString() != null) {
                 MQTopic publisher = queueManager.accessTopic(config.getTopicString(), config.getTopicName(),
                         CMQC.MQTOPIC_OPEN_AS_PUBLICATION, CMQC.MQOO_OUTPUT);
                 MQMessage mqMessage = buildMQmessage(config, queueMessage);
                 publisher.put(mqMessage);
                 publisher.close();
-                queueManager.disconnect();
                 log.info("Message successfully placed at " + config.getTopicName());
             }
         } catch (MQException mqe) {
@@ -127,12 +126,25 @@ public class IBMMQProducer extends AbstractConnector {
     private MQMessage buildMQmessage(IBMMQConfiguration config, String queueMessage) throws IOException {
 
         MQMessage mqMessage = new MQMessage();
-        mqMessage.messageId = config.getMessageID().getBytes();
-        mqMessage.correlationId = config.getCorrelationID().getBytes();
         mqMessage.messageType = config.getMessageType();
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(new Date(System.currentTimeMillis()));
         mqMessage.putDateTime = cal;
+        if (config.getMessageID() != null) {
+            mqMessage.messageId = config.getMessageID().getBytes();
+        }
+        if (config.getCorrelationID() != null) {
+            mqMessage.correlationId = config.getCorrelationID().getBytes();
+        }
+        if (config.getMessageType() == 4) {
+            mqMessage.report = CMQC.MQRO_EXCEPTION_WITH_FULL_DATA | CMQC.MQRO_COA_WITH_FULL_DATA | CMQC.MQRO_COD_WITH_FULL_DATA | CMQC.MQRO_EXPIRATION_WITH_FULL_DATA | CMQC.MQRO_NEW_MSG_ID | CMQC.MQRO_COPY_MSG_ID_TO_CORREL_ID;
+        }
+        if (config.getReplyToQueueName() != null) {
+            mqMessage.replyToQueueName = config.getReplyToQueueName();
+        }
+        if (config.getReplyToQueueManager() != null) {
+            mqMessage.replyToQueueManagerName = config.getReplyToQueueManager();
+        }
         if (config.getPriority() != -1000) {
             mqMessage.priority = config.getPriority();
         }
