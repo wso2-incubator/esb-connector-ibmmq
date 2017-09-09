@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+
+   WSO2 Inc. licenses this file to you under the Apache License,
+   Version 2.0 (the "License"); you may not use this file except
+   in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied. See the License for the
+   specific language governing permissions and limitations
+   under the License.-->
+<template name="init" onError="fault" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="username" description="user of the IBM-MQ installation"/>
+    <parameter name="password" description="password of the user IBM-MQ installation"/>
+    <parameter name="topicName" description="topic of the publisher"/>
+    <parameter name="topicString" description="topic of the publisher"/>
+    <parameter name="port" description="port for the TCP connection"/>
+    <parameter name="host" description="host need to connect"/>
+    <parameter name="queueManager" description="name of the queue manager"/>
+    <parameter name="queue" description="name of the queue"/>
+    <parameter name="channel" description="name of the channel"/>
+    <parameter name="transportType" description="transport type"/>
+    <parameter name="timeout" description="timeout of the pool"/>
+    <parameter name="maxConnections" description="maximum connection that the connection pool can handle"/>
+    <parameter name="maxUnusedConnections"
+               description="maximum unused connections that the connection pool can handle"/>
+    <parameter name="cipherSuite" description="ciphersuit for the ssl connection"/>
+    <parameter name="fipsRequired" description="fips no/yes"/>
+    <parameter name="sslEnable" description="ssl enable yes/no"/>
+    <parameter name="messageID" description="message id"/>
+    <parameter name="correlationID" description="correlation id"/>
+    <parameter name="groupID" description="group id"/>
+    <parameter name="messageType" description="Type of message"/>
+    <parameter name="priority" description="Priority of the message"/>
+    <parameter name="persistent" description="Message is persistent or not"/>
+    <parameter name="connectionNameList" description="List of ports and hosts"/>
+    <parameter name="reconnectTimeout" description="Timeout for reconnection"/>
+    <parameter name="charSet" description="character set of the destination queue"/>
+    <parameter name="replyToQueueName" description="The name of the queue to which a reply should be sent."/>
+    <parameter name="replyToQueueManagerName"
+               description="The name of the queue manager to which a reply should be sent."/>
+    <sequence>
+        <property expression="$func:username" name="uri.var.username" scope="default" type="STRING"/>
+        <property expression="$func:password" name="uri.var.password" scope="default" type="STRING"/>
+        <property expression="$func:topicName" name="uri.var.topicName" scope="default" type="STRING"/>
+        <property expression="$func:topicString" name="uri.var.topicString" scope="default" type="STRING"/>
+        <property expression="$func:port" name="uri.var.port" scope="default" type="STRING"/>
+        <property expression="$func:host" name="uri.var.host" scope="default" type="STRING"/>
+        <property expression="$func:queueManager" name="uri.var.queueManager" scope="default" type="STRING"/>
+        <property expression="$func:queue" name="uri.var.queue" scope="default" type="STRING"/>
+        <property expression="$func:channel" name="uri.var.channel" scope="default" type="STRING"/>
+        <property expression="$func:transportType" name="uri.var.transportType" scope="default" type="STRING"/>
+        <property expression="$func:timeout" name="uri.var.timeout" scope="default" type="STRING"/>
+        <property expression="$func:maxConnections" name="uri.var.maxConnections" scope="default" type="STRING"/>
+        <property expression="$func:maxUnusedConnections" name="uri.var.maxUnusedConnections" scope="default"
+                  type="STRING"/>
+        <property expression="$func:cipherSuite" name="uri.var.cipherSuite" scope="default" type="STRING"/>
+        <property expression="$func:fipsRequired" name="uri.var.fipsRequired" scope="default" type="STRING"/>
+        <property expression="$func:sslEnable" name="uri.var.sslEnable" scope="default" type="STRING"/>
+        <property expression="$func:correlationID" name="uri.var.correlationID" scope="default" type="STRING"/>
+        <property expression="$func:messageID" name="uri.var.messageID" scope="default" type="STRING"/>
+        <property expression="$func:groupID" name="uri.var.groupID" scope="default" type="STRING"/>
+        <property expression="$func:messageType" name="uri.var.messageType" scope="default" type="STRING"/>
+        <property expression="$func:priority" name="uri.var.priority" scope="default" type="STRING"/>
+        <property expression="$func:persistent" name="uri.var.persistent" scope="default" type="STRING"/>
+        <property expression="$func:connectionNameList" name="uri.var.connectionNameList" scope="default"
+                  type="STRING"/>
+        <property expression="$func:reconnectTimeout" name="uri.var.reconnectTimeout" scope="default" type="STRING"/>
+        <property expression="$func:charSet" name="uri.var.charSet" scope="default" type="STRING"/>
+        <property expression="$func:replyToQueueName" name="uri.var.replyToQueueName" scope="default" type="STRING"/>
+        <property expression="$func:replyToQueueManagerName" name="uri.var.replyToQueueManagerName" scope="default"
+                  type="STRING"/>
+    </sequence>
+</template>
